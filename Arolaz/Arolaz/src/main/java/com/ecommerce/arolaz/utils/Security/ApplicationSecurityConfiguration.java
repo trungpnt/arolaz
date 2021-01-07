@@ -1,4 +1,4 @@
-package com.ecommerce.arolaz.Security;
+package com.ecommerce.arolaz.utils.Security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

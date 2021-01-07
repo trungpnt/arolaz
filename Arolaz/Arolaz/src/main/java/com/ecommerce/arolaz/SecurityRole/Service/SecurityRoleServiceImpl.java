@@ -16,6 +16,7 @@ public class SecurityRoleServiceImpl implements SecurityRoleService {
     }
 
     public SecurityRole findRoleByName(String roleName) {
+        //Handling
         SecurityRole toFind = securityRoleRepository.findByRoleName(roleName);
         return toFind;
     }

@@ -1,4 +1,4 @@
-package com.ecommerce.arolaz.Security;
+package com.ecommerce.arolaz.utils.Security;
 
 import com.ecommerce.arolaz.SecurityUser.Model.SecurityUser;
 import com.ecommerce.arolaz.SecurityUser.Repository.SecurityUserRepository;
@@ -81,18 +81,19 @@ public class ShopCustomerDetailsService implements UserDetailsService {
      * @return UserDetails if valid, Empty otherwise
      */
     public Optional<UserDetails> loadUserByJwtToken(String jwtToken) {
-        if (jwtProvider.isValidToken(jwtToken)) {
-            return Optional.of(
-                    withUsername(jwtProvider.getUsername(jwtToken))
-                            .authorities(jwtProvider.getRoles(jwtToken))
-                            .password("") //token does not have password but field may not be empty
-                            .accountExpired(false)
-                            .accountLocked(false)
-                            .credentialsExpired(false)
-                            .disabled(false)
-                            .build());
-        }
-        return Optional.empty();
+
+        jwtProvider.isValidToken(jwtToken);
+
+        return Optional.of(
+                withUsername(jwtProvider.getUsername(jwtToken))
+                        .authorities(jwtProvider.getRoles(jwtToken))
+                        .password("") //token does not have password but field may not be empty
+                        .accountExpired(false)
+                        .accountLocked(false)
+                        .credentialsExpired(false)
+                        .disabled(false)
+                        .build());
+
     }
 
 }

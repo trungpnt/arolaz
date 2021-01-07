@@ -1,4 +1,4 @@
-package com.ecommerce.arolaz.Security;
+package com.ecommerce.arolaz.utils.Security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

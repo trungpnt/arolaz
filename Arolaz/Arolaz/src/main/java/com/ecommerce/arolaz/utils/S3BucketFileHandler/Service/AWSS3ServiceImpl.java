@@ -1,9 +1,9 @@
-package com.ecommerce.arolaz.S3BucketFileHandler.Service;
+package com.ecommerce.arolaz.utils.S3BucketFileHandler.Service;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.AmazonS3;
-import com.ecommerce.arolaz.S3BucketFileHandler.ProductImgUrlResponseModel;
+import com.ecommerce.arolaz.utils.S3BucketFileHandler.ProductImgUrlResponseModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

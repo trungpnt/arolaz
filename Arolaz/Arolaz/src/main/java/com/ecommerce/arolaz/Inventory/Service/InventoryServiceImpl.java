@@ -1,6 +1,6 @@
 package com.ecommerce.arolaz.Inventory.Service;
 
-import com.amazonaws.services.alexaforbusiness.model.NotFoundException;
+import com.ecommerce.arolaz.utils.ExceptionHandlers.InventoryNotFoundException;
 import com.ecommerce.arolaz.Inventory.Model.Inventory;
 import com.ecommerce.arolaz.Inventory.Repository.InventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public class InventoryServiceImpl implements InventoryService {
     public Optional<Inventory> findBySizeAndColor(String proId, String sizeId, String colorId) {
         Optional<Inventory> inventory = inventoryRepository.findByProductIdAndProductSizeIdAndColorId(proId,sizeId,colorId);
         if(!inventory.isPresent()){
-            throw new NotFoundException("Inventory with given properties not found !");
+            throw new InventoryNotFoundException(String.format("Inventory with '%s' and '%s' and '%s' not found !", proId,sizeId,colorId));
         }
         return inventory;
     }

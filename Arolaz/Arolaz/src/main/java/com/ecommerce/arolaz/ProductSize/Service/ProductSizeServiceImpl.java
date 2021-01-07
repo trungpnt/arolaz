@@ -1,5 +1,6 @@
 package com.ecommerce.arolaz.ProductSize.Service;
 
+import com.ecommerce.arolaz.utils.ExceptionHandlers.ProductSizeNotFoundException;
 import com.ecommerce.arolaz.ProductSize.Model.ProductSize;
 import com.ecommerce.arolaz.ProductSize.Repository.ProductSizeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,21 @@ public class ProductSizeServiceImpl implements ProductSizeService{
     }
 
     @Override
-    public Optional<ProductSize> findByGivenProperties(String proId, String sizeName, Double price) {
+    public Optional<ProductSize> findByProductIdAndSizeNameAndPrice(String proId, String sizeName, Double price) {
         Optional<ProductSize> find = productSizeRepository.findByProductIdAndSizeNameAndPrice(proId, sizeName, price);
+        if(!find.isPresent()){
+            throw new ProductSizeNotFoundException(String.format("product size with '%s','%s','%f' not found!",proId,sizeName,price));
+        }
         return find;
     }
 
-//    private ProductSizeResponseModel toProductSizeResponseModel(ProductSize productSize){
-//        return new ProductSizeResponseModel(productSize.getProductSizeId().toString(),productSize.getProductId(),productSize.getSizeName(),productSize.getPrice());
-//    }
+    @Override
+    public Optional<ProductSize> findByProductIdAndSizeName(String proId, String sizeName) {
+        Optional<ProductSize> find = productSizeRepository.findByProductIdAndSizeName(proId, sizeName);
+        if (!find.isPresent()){
+            throw new ProductSizeNotFoundException(String.format("product size with '%s','%s' not found",proId,sizeName));
+        }
+        return find;
+    }
+
 }

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -37,5 +38,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Optional<Order> findByOrderId(ObjectId orderId) {
         return orderRepository.findById(orderId);
+    }
+
+    @Override
+    public Page<Order> findByUnregisteredUserId(String unregisteredUserId,Pageable pageable) {
+        return orderRepository.findByUnregisteredUserId(unregisteredUserId,pageable);
     }
 }

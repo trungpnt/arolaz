@@ -3,7 +3,7 @@ package com.ecommerce.arolaz.Color.Service;
 
 import com.ecommerce.arolaz.Color.Model.Color;
 import com.ecommerce.arolaz.Color.Repository.ColorRepository;
-import com.ecommerce.arolaz.Color.RequestResponseModels.ColorResponseModel;
+import com.ecommerce.arolaz.utils.ExceptionHandlers.ColorNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +23,9 @@ public class ColorServiceImpl implements ColorService {
     @Override
     public Optional<Color> findByColorName(String colorName) {
         Optional<Color> find = repository.findByColorName(colorName);
+        if(!find.isPresent()){
+            throw new ColorNotFoundException(String.format("Color with '%s' not found ",colorName));
+        }
         return find;
     }
 

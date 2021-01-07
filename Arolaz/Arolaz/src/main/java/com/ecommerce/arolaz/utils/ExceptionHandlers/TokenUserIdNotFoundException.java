@@ -1,6 +1,5 @@
-package com.ecommerce.arolaz.ExceptionHandlers;
+package com.ecommerce.arolaz.utils.ExceptionHandlers;
 
-import com.amazonaws.services.xray.model.Http;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

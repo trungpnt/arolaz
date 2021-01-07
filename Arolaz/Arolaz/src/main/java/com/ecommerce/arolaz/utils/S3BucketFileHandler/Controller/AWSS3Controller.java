@@ -1,7 +1,7 @@
-package com.ecommerce.arolaz.S3BucketFileHandler.Controller;
+package com.ecommerce.arolaz.utils.S3BucketFileHandler.Controller;
 
-import com.ecommerce.arolaz.S3BucketFileHandler.ProductImgUrlResponseModel;
-import com.ecommerce.arolaz.S3BucketFileHandler.Service.AWSS3Service;
+import com.ecommerce.arolaz.utils.S3BucketFileHandler.ProductImgUrlResponseModel;
+import com.ecommerce.arolaz.utils.S3BucketFileHandler.Service.AWSS3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

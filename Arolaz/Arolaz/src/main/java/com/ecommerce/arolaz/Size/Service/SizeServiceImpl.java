@@ -1,4 +1,34 @@
 package com.ecommerce.arolaz.Size.Service;
 
-public class SizeServiceImpl {
+import com.ecommerce.arolaz.utils.ExceptionHandlers.SizeNotFoundException;
+import com.ecommerce.arolaz.Size.Model.Size;
+import com.ecommerce.arolaz.Size.Repository.SizeRepository;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Service
+public class SizeServiceImpl implements SizeService {
+    @Autowired
+    private SizeRepository sizeRepository;
+
+    @Override
+    public Optional<Size> findBySizeName(String sizeName) {
+        Optional<Size> foundSize = sizeRepository.findBySizeName(sizeName);
+        if(!foundSize.isPresent()){
+            throw new SizeNotFoundException(String.format("Size with '%s' not found",sizeName));
+        }
+        return foundSize;
+    }
+
+    @Override
+    public Optional<Size> findBySizeId(ObjectId sizeId) {
+        Optional<Size> foundSize = sizeRepository.findById(sizeId);
+        if(!foundSize.isPresent()){
+            throw new SizeNotFoundException(String.format("Size with '%s' not found",sizeId.toString()));
+        }
+        return foundSize;
+    }
 }

@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface ProductSizeService {
     ProductSize addNewProductSize(ProductSize productSize);
-    Optional<ProductSize> findByGivenProperties(String proId, String sizeName, Double price);
-
+    Optional<ProductSize> findByProductIdAndSizeNameAndPrice(String proId, String sizeName, Double price);
+    Optional<ProductSize> findByProductIdAndSizeName(String proId,String sizeName);
 }

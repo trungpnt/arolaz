@@ -1,4 +1,4 @@
-package com.ecommerce.arolaz.S3BucketFileHandler;
+package com.ecommerce.arolaz.utils.S3BucketFileHandler;
 
 public class ProductImgUrlResponseModel {
     private String fileName;

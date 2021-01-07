@@ -12,4 +12,5 @@ public interface ProductService {
     Product addProduct(Product product);
     Page<Product> findAllProducts(Pageable pageable);
     Optional<Product> findByProductId(ObjectId productId);
+    void deleteProductById(ObjectId productId);
 }

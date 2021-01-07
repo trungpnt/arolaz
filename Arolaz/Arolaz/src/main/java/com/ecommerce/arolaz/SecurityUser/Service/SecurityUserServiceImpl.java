@@ -1,6 +1,6 @@
 package com.ecommerce.arolaz.SecurityUser.Service;
 
-import com.ecommerce.arolaz.Security.JwtProvider;
+import com.ecommerce.arolaz.utils.Security.JwtProvider;
 import com.ecommerce.arolaz.SecurityRole.Model.SecurityRole;
 import com.ecommerce.arolaz.SecurityRole.Repository.SecurityRoleRepository;
 import com.ecommerce.arolaz.SecurityUser.Model.SecurityUser;
@@ -201,14 +201,13 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     public Optional<SecurityUser> signInWithToken(String token) {
         Optional<SecurityUser> securityUser = null;
         String email = null;
-        if (jwtProvider.isValidToken(token)){
-            email = jwtProvider.getEmail(token);
-            if(securityUserRepository.findByEmail(email).isPresent()){
-               securityUser = securityUserRepository.findByEmail(email);
-            }
-            else{
-                return Optional.empty();
-            }
+        jwtProvider.isValidToken(token);
+        email = jwtProvider.getEmail(token);
+        if(securityUserRepository.findByEmail(email).isPresent()){
+            securityUser = securityUserRepository.findByEmail(email);
+        }
+        else{
+            return Optional.empty();
         }
         return securityUser;
     }
@@ -225,8 +224,8 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     }
 
     @Override
-    public Boolean isValidToken(String token) {
-        return jwtProvider.isValidToken(token);
+    public void isValidToken(String token) {
+        jwtProvider.isValidToken(token);
     }
 
     @Override

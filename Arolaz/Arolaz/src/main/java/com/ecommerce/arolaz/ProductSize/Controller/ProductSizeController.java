@@ -33,7 +33,7 @@ public class ProductSizeController {
     public ResponseEntity<ProductSizeResponseModel> addNewProductSize(CreateProductSizeRequestModel createProductSizeRequestModel){
         ProductSize persistProductSize = modelMapper.map(createProductSizeRequestModel,ProductSize.class);
 
-        Optional<ProductSize> foundProductSize = service.findByGivenProperties(createProductSizeRequestModel.getProductId(), createProductSizeRequestModel.getSizeName(), createProductSizeRequestModel.getPrice());
+        Optional<ProductSize> foundProductSize = service.findByProductIdAndSizeNameAndPrice(createProductSizeRequestModel.getProductId(), createProductSizeRequestModel.getSizeName(), createProductSizeRequestModel.getPrice());
 
         if(foundProductSize.isPresent()){
             throw new RuntimeException("Product Size with given props already exists!!!");

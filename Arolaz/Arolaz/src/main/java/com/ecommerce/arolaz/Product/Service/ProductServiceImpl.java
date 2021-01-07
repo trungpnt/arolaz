@@ -1,7 +1,6 @@
 package com.ecommerce.arolaz.Product.Service;
 
-
-import com.amazonaws.services.alexaforbusiness.model.NotFoundException;
+import com.ecommerce.arolaz.utils.ExceptionHandlers.ProductNotFoundException;
 import com.ecommerce.arolaz.Product.Model.Product;
 import com.ecommerce.arolaz.Product.Repository.ProductRepository;
 import org.bson.types.ObjectId;
@@ -37,9 +36,17 @@ public class ProductServiceImpl implements ProductService {
     public Optional<Product> findByProductId(ObjectId productId) {
         Optional<Product> product = productRepository.findByProductId(productId);
         if(!product.isPresent()){
-            throw new NotFoundException("Product not found !");
+            throw new ProductNotFoundException(String.format("Product with '%s' not found !",productId.toString()));
         }
         return product;
+    }
+
+    @Override
+    public void deleteProductById(ObjectId productId) {
+        Optional<Product> product = findByProductId(productId);
+        if(product.isPresent()){
+            productRepository.delete(product.get());
+        }
     }
 
 }

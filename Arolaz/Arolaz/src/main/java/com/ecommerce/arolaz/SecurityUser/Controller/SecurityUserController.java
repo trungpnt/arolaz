@@ -1,17 +1,16 @@
 package com.ecommerce.arolaz.SecurityUser.Controller;
 
 
-import com.ecommerce.arolaz.ExceptionHandlers.InvalidTokenException;
-import com.ecommerce.arolaz.ExceptionHandlers.UserNotFoundException;
-import com.ecommerce.arolaz.Security.JwtProvider;
+import com.ecommerce.arolaz.utils.ExceptionHandlers.UserNotFoundException;
+import com.ecommerce.arolaz.utils.Security.JwtProvider;
 import com.ecommerce.arolaz.SecurityRole.Repository.SecurityRoleRepository;
 import com.ecommerce.arolaz.SecurityUser.Model.SecurityUser;
 import com.ecommerce.arolaz.SecurityUser.Repository.SecurityUserRepository;
 import com.ecommerce.arolaz.SecurityUser.RequestResponseModels.*;
 import com.ecommerce.arolaz.SecurityUser.Service.SecurityUserService;
 import com.ecommerce.arolaz.utils.CustomizedPagingResponseModel;
-import com.ecommerce.arolaz.utils.ObjectCreationSuccessResponse;
 import com.ecommerce.arolaz.utils.PasswordValidator;
+import com.ecommerce.arolaz.utils.TokenValidator;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -49,6 +48,9 @@ public class SecurityUserController {
 
     @Autowired
     private SecurityUserService securityUserService;
+
+    @Autowired
+    private TokenValidator tokenValidator;
 
     @Autowired
     private JwtProvider jwtProvider;
@@ -138,11 +140,10 @@ public class SecurityUserController {
     @PreAuthorize("hasAuthority('USER')")
     public HttpStatus updateUserByToken(HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal, @RequestBody @Valid EditUserRequestModel editUserRequestModel) {
         String token = headerVal.substring(headerVal.indexOf(" "), headerVal.length());
+        tokenValidator.validateTokenUserAuthorization(token);
         String phoneFromToken = jwtProvider.getPhone(token);
         String userId = jwtProvider.getUserId(token);
-        if (!securityUserService.isValidToken(token)) {
-            throw new InvalidTokenException("token is invalid");
-        }
+
         Optional<SecurityUser> user = securityUserRepository.findByPhoneNumber(phoneFromToken);
 
         if (!user.isPresent()) {
@@ -181,11 +182,8 @@ public class SecurityUserController {
     @ResponseStatus(HttpStatus.OK)
     public HttpStatus updateUserPasswordByToken(HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal, @RequestBody @Valid EditUserPasswordRequestModel editUserPasswordRequestModel) {
         String token = headerVal.substring(headerVal.indexOf(" "), headerVal.length());
+        tokenValidator.validateTokenUserAuthorization(token);
         String phone = jwtProvider.getPhone(token);
-
-        if (!securityUserService.isValidToken(token)) {
-            return HttpStatus.BAD_REQUEST;
-        }
 
         Optional<SecurityUser> user = securityUserRepository.findByPhoneNumber(phone);
         if (!user.isPresent()) {

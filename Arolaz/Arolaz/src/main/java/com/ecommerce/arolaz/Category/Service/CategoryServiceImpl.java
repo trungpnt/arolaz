@@ -2,6 +2,7 @@ package com.ecommerce.arolaz.Category.Service;
 
 import com.ecommerce.arolaz.Category.Model.Category;
 import com.ecommerce.arolaz.Category.Repository.CategoryRepository;
+import com.ecommerce.arolaz.utils.ExceptionHandlers.CategoryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +16,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Optional<Category> findByCategoryName(String name) {
-        //name = name.substring(0,1).toUpperCase() + name.substring(1);
-        return categoryRepository.findByCategoryName(name.toUpperCase());
+        Optional<Category> categoryFound = categoryRepository.findByCategoryName(name);
+        if(!categoryFound.isPresent()){
+            throw new CategoryNotFoundException(String.format("Category with '%s' not found!",name));
+        }
+        return categoryFound;
     }
 
     @Override

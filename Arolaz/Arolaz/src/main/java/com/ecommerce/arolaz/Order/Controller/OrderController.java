@@ -1,8 +1,8 @@
 package com.ecommerce.arolaz.Order.Controller;
 
-import com.ecommerce.arolaz.ExceptionHandlers.InvalidTokenException;
-import com.ecommerce.arolaz.ExceptionHandlers.TokenUserIdNotFoundException;
-import com.ecommerce.arolaz.ExceptionHandlers.UserNotFoundException;
+import com.ecommerce.arolaz.utils.ExceptionHandlers.InsufficientInventoryQuantityException;
+import com.ecommerce.arolaz.utils.ExceptionHandlers.TokenUserIdNotFoundException;
+import com.ecommerce.arolaz.utils.ExceptionHandlers.UserNotFoundException;
 import com.ecommerce.arolaz.Inventory.Model.Inventory;
 import com.ecommerce.arolaz.Inventory.Repository.InventoryRepository;
 import com.ecommerce.arolaz.Order.Model.Order;
@@ -12,22 +12,22 @@ import com.ecommerce.arolaz.Order.RequestResponseModels.OrderResponseModel;
 import com.ecommerce.arolaz.Order.RequestResponseModels.PagedOrderResponseModel;
 import com.ecommerce.arolaz.Order.Service.OrderService;
 import com.ecommerce.arolaz.OrderDetails.Model.OrderDetails;
-import com.ecommerce.arolaz.OrderDetails.Repository.OrderDetailsRepository;
 import com.ecommerce.arolaz.OrderDetails.RequestResponseModels.CreateOrderDetailsRequestModel;
-import com.ecommerce.arolaz.Product.Repository.ProductRepository;
+import com.ecommerce.arolaz.OrderDetails.Service.OrderDetailsService;
 import com.ecommerce.arolaz.Product.Service.ProductService;
 import com.ecommerce.arolaz.ProductSize.Model.ProductSize;
-import com.ecommerce.arolaz.ProductSize.Repository.ProductSizeRepository;
-import com.ecommerce.arolaz.Security.JwtProvider;
+import com.ecommerce.arolaz.ProductSize.Service.ProductSizeService;
+import com.ecommerce.arolaz.utils.Security.JwtProvider;
 import com.ecommerce.arolaz.SecurityUser.Model.SecurityUser;
 import com.ecommerce.arolaz.SecurityUser.Service.SecurityUserService;
 import com.ecommerce.arolaz.Size.Model.Size;
-import com.ecommerce.arolaz.Size.Repository.SizeRepository;
+import com.ecommerce.arolaz.Size.Service.SizeService;
 import com.ecommerce.arolaz.UnregisteredUsers.Model.UnregisteredUser;
-import com.ecommerce.arolaz.UnregisteredUsers.Repository.UnregisteredUserRepository;
 import com.ecommerce.arolaz.UnregisteredUsers.RequestResponseModels.CreateUnregisteredUserModel;
 import com.ecommerce.arolaz.UnregisteredUsers.RequestResponseModels.UnregisteredUserOrderRequestModel;
+import com.ecommerce.arolaz.UnregisteredUsers.Service.UnregisteredUserService;
 import com.ecommerce.arolaz.utils.CustomizedPagingResponseModel;
+import com.ecommerce.arolaz.utils.TokenValidator;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -42,7 +42,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,12 +54,12 @@ public class OrderController {
     private OrderService orderService;
 
     @Autowired
-    private OrderDetailsRepository orderDetailsRepository;
+    private OrderDetailsService orderDetailsService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
 
     @Autowired
-    private UnregisteredUserRepository unregisteredUserRepository;
+    private UnregisteredUserService unregisteredUserService;
 
     @Autowired
     private ProductService productService;
@@ -69,39 +68,32 @@ public class OrderController {
     private SecurityUserService securityUserService;
 
     @Autowired
-    private ProductRepository productRepository;
+    private ProductSizeService productSizeService;
 
     @Autowired
-    private ProductSizeRepository productSizeRepository;
-
-    @Autowired
-    private SecurityUserService securityUserRepository;
-
-    @Autowired
-    private SizeRepository sizeRepository;
-
-    @Autowired
-    private JwtProvider jwtProvider;
+    private SizeService sizeService;
 
     @Autowired
     private ModelMapper modelMapper;
 
     @Autowired
-    private InventoryRepository inventoryRepository;
+    private JwtProvider jwtProvider;
 
-    private ArrayList<OrderDetails> orderDetailsArrayList = new ArrayList<>();
+    @Autowired
+    private TokenValidator tokenValidator;
+
+    @Autowired
+    private InventoryRepository inventoryRepository;
 
     private OrderDetails toOrderDetailsDomain (String orderId){
         OrderDetails orderDetails = new OrderDetails();
         orderDetails.setOrderId(orderId);
         return orderDetails;
     }
-
     /**
-     *
+     * Api for Unregistered users to submit orders
      * @param unregisteredUserOrderRequestModel
-     * Unregistered user submitting orders
-     *
+     * @return The Id of created Order
      */
     @PostMapping(path = "/order/unregistered")
     public OrderIdResponseModel addNewOrder(@Valid @RequestBody UnregisteredUserOrderRequestModel unregisteredUserOrderRequestModel ){
@@ -116,7 +108,7 @@ public class OrderController {
          * Persist Unregistered User
          * */
         UnregisteredUser toPersistUnregisteredUser = modelMapper.map(createUnregisteredUserModel,UnregisteredUser.class);
-        UnregisteredUser afterSaved =  unregisteredUserRepository.save(toPersistUnregisteredUser);
+        UnregisteredUser afterSaved =  unregisteredUserService.addNewUnregisteredUser(toPersistUnregisteredUser);
 
         /**
          * Order process begins
@@ -124,6 +116,138 @@ public class OrderController {
          * */
         Order toPersistOrder = new Order();
         toPersistOrder.setUnregisteredUserId(afterSaved.getUnregisteredUserId().toString());
+        //toPersistOrder.setNote(createOrderRequestModel.getNote());
+        toPersistOrder.setAddress(createOrderRequestModel.getAddress());
+
+        Order toGetOrderId = orderService.addOrder(toPersistOrder);
+        String orderId = toGetOrderId.getOrderId().toString();
+
+        /**
+         * Order Details Process begins
+         * Calculating the TotalQuantity and TotalPrice to persist into Order
+         * */
+        double totalPrice = 0;
+        int totalQuantity = 0;
+
+        List<CreateOrderDetailsRequestModel> orderDetailsList = createOrderRequestModel.getCreateOrderDetails();
+        for(int i  = 0, n = orderDetailsList.size(); i < n; i++){
+            OrderDetails orderDetails = new OrderDetails();
+
+            /***
+             * Place each extracted values into variables
+             */
+            String productId = orderDetailsList.get(i).getProductId();
+            String sizeId = orderDetailsList.get(i).getSizeId();
+            String colorId = orderDetailsList.get(i).getColorId();
+            int quantity = orderDetailsList.get(i).getQuantity();
+
+            /**
+             * Get sizeName for this sizeId
+             * @param sizeId
+             * @return sizeName
+             * */
+            ObjectId sizeObjectId = new ObjectId(sizeId);
+            Optional<Size> sizeFound = sizeService.findBySizeId(sizeObjectId);
+            String sizeName = sizeFound.get().getSizeName();
+
+            /**
+             * Get unitPrice for this product
+             * @param productId,sizeId
+             * @return unitPrice
+             * */
+            Optional<ProductSize> productSizeFound = productSizeService.findByProductIdAndSizeName(productId,sizeName);
+            double unitPrice = productSizeFound.get().getPrice();
+
+            /**
+             * Calculate the price for calculatedPrice field
+             * */
+            double calculatedPrice = quantity * unitPrice;
+
+            /**
+             * Check each product's quantity against one in Inventory
+             * Update remaining quantity
+             *
+             * @param productId,sizeId,colorId
+             * @return quantity
+             * */
+            Optional<Inventory> inventoryFound =  inventoryRepository.findByProductIdAndProductSizeIdAndColorId(productId,sizeId,colorId);
+            int inventoryQuantity = inventoryFound.get().getQuantity();
+
+            /**
+             * Ensure sufficient quantity
+             * */
+            //Should be delegated to a function
+            if( quantity > inventoryQuantity ){
+                throw new InsufficientInventoryQuantityException("The product quantity exceeds inventory's");
+            }
+
+            int newInventoryQuantity = inventoryQuantity - quantity;
+
+            /**
+             * Delete old inventory
+             * Update new Inventory's quantity
+             * @param productId,sizeId,colorId,newInventoryQuantity
+             * @return updatedInventory
+             * */
+            inventoryRepository.delete(inventoryFound.get());
+            Inventory newInventory = new Inventory(productId,sizeId,colorId,newInventoryQuantity);
+            inventoryRepository.save(newInventory);
+
+            /**
+             * Creating and persisting order details model
+             * */
+            orderDetails.setProductId(productId);
+            orderDetails.setOrderId(orderId);
+            orderDetails.setCalculatedPrice(calculatedPrice);
+            orderDetails.setProductSizeId(sizeId);
+            orderDetails.setColorId(colorId);
+            orderDetails.setOrderId(orderId);
+            orderDetails.setUnitPrice(unitPrice);
+            orderDetails.setQuantity(quantity);
+
+            orderDetailsService.addOrderDetails(orderDetails);
+
+            /**
+             *Preparing totalPrice and totalQuantity for persisting Order
+             * */
+            totalPrice += calculatedPrice;
+            totalQuantity += quantity;
+        }
+        toGetOrderId.setTotalPrice(totalPrice);
+        toGetOrderId.setTotalQuantity(totalQuantity);
+        orderService.addOrder(toGetOrderId);
+
+        return new OrderIdResponseModel(orderId);
+
+    }
+
+
+    /**
+     * Registered user submitting orders
+     * @param createOrderRequestModel
+     * @return Id of Order
+     */
+    @PreAuthorize("hasAuthority('USER')")
+    @PostMapping(path = "/order")
+    public OrderIdResponseModel addNewOrder(HttpServletRequest request, @RequestHeader(value = "Authorization",required = true) String headerVal, @Valid @RequestBody CreateOrderRequestModel createOrderRequestModel ) {
+        /***
+         * decode TOKEN's and validate against the details
+         */
+        String token = headerVal.substring(headerVal.indexOf(" "), headerVal.length());
+        tokenValidator.validateTokenUserAuthorization(token);
+        String userId = jwtProvider.getUserId(token);
+        Optional<SecurityUser> user = securityUserService.findByPhoneNumber(jwtProvider.getPhone(token));
+
+        if (!user.isPresent()) {
+            throw new RuntimeException("USER NOT FOUND, PLEASE CHECK YOUR INFORMATION BEFORE PROCEEDING TO ORDER");
+        }
+
+        /**
+         * Order process begins
+         *
+         * */
+        Order toPersistOrder = new Order();
+        toPersistOrder.setSecurityUserId(userId);
         toPersistOrder.setNote(createOrderRequestModel.getNote());
         toPersistOrder.setAddress(createOrderRequestModel.getAddress());
 
@@ -153,13 +277,13 @@ public class OrderController {
              * Retrieving sizeName for this sizeId
              * */
             ObjectId sizeObjectId = new ObjectId(sizeId);
-            Size sizeFound = sizeRepository.findBySizeId(sizeObjectId);
-            String sizeName = sizeFound.getSizeName();
+            Optional<Size> sizeFound = sizeService.findBySizeId(sizeObjectId);
+            String sizeName = sizeFound.get().getSizeName();
 
             /**
              * Retrieving the unit price for this product
              * */
-            Optional<ProductSize> productSizeFound = productSizeRepository.findByProductIdAndSizeName(productId,sizeName);
+            Optional<ProductSize> productSizeFound = productSizeService.findByProductIdAndSizeName(productId,sizeName);
             double unitPrice = productSizeFound.get().getPrice();
 
             /**
@@ -180,8 +304,9 @@ public class OrderController {
 
             int newInventoryQuantity = inventoryQuantity - quantity;
 
-            //Deletion flow ....
-            //Inventory inventoryToDelete = new Inventory(productId,sizeId,colorId,quantity);
+            /**
+             * Update new Inventory's quantity
+             * */
             inventoryRepository.delete(inventoryFound.get());
             Inventory newInventory = new Inventory(productId,sizeId,colorId,newInventoryQuantity);
             inventoryRepository.save(newInventory);
@@ -198,7 +323,7 @@ public class OrderController {
             orderDetails.setUnitPrice(unitPrice);
             orderDetails.setQuantity(quantity);
 
-            orderDetailsRepository.save(orderDetails);
+            orderDetailsService.addOrderDetails(orderDetails);
 
             /**
              *Preparing totalPrice and totalQuantity for persisting Order
@@ -211,128 +336,6 @@ public class OrderController {
         orderService.addOrder(toGetOrderId);
 
         return new OrderIdResponseModel(orderId);
-
-    }
-
-
-    /**
-     *
-     * @param createOrderRequestModel
-     * Registered user submitting orders
-     *
-     */
-    @PreAuthorize("hasAuthority('USER')")
-    @PostMapping(path = "/order")
-    public OrderIdResponseModel addNewOrder(HttpServletRequest request, @RequestHeader(value = "Authorization",required = true) String headerVal, @Valid @RequestBody CreateOrderRequestModel createOrderRequestModel ) {
-        /***
-         * decode TOKEN's and validate against the details
-         */
-        String token = headerVal.substring(headerVal.indexOf(" "), headerVal.length());
-            String userId = jwtProvider.getUserId(token);
-
-            if (!securityUserService.isValidToken(token)) {
-                throw new RuntimeException("TOKEN IS INVALID ");
-            }
-            Optional<SecurityUser> user = securityUserRepository.findByPhoneNumber(jwtProvider.getPhone(token));
-
-            if (!user.isPresent()) {
-                throw new RuntimeException("USER NOT FOUND, PLEASE CHECK YOUR INFORMATION BEFORE PROCEEDING TO ORDER");
-            }
-
-            /**
-             * Order process begins
-             *
-             * */
-            Order toPersistOrder = new Order();
-            toPersistOrder.setSecurityUserId(userId);
-            toPersistOrder.setNote(createOrderRequestModel.getNote());
-            toPersistOrder.setAddress(createOrderRequestModel.getAddress());
-
-            Order toGetOrderId = orderService.addOrder(toPersistOrder);
-            String orderId = toGetOrderId.getOrderId().toString();
-
-            /**
-             * Order Details Process begins
-             * Calculating the TotalQuantity and TotalPrice to persist into Order
-             * */
-            double totalPrice = 0;
-            int totalQuantity = 0;
-
-            List<CreateOrderDetailsRequestModel> orderDetailsList = createOrderRequestModel.getCreateOrderDetails();
-            for(int i  = 0, n = orderDetailsList.size(); i < n; i++){
-                OrderDetails orderDetails = new OrderDetails();
-
-                /***
-                 * Place each extracted values into variables
-                 */
-                String productId = orderDetailsList.get(i).getProductId();
-                String sizeId = orderDetailsList.get(i).getSizeId();
-                String colorId = orderDetailsList.get(i).getColorId();
-                int quantity = orderDetailsList.get(i).getQuantity();
-
-                /**
-                 * Retrieving sizeName for this sizeId
-                 * */
-                ObjectId sizeObjectId = new ObjectId(sizeId);
-                Size sizeFound = sizeRepository.findBySizeId(sizeObjectId);
-                String sizeName = sizeFound.getSizeName();
-
-                /**
-                 * Retrieving the unit price for this product
-                 * */
-                Optional<ProductSize> productSizeFound = productSizeRepository.findByProductIdAndSizeName(productId,sizeName);
-                double unitPrice = productSizeFound.get().getPrice();
-
-                /**
-                 * Calculate the price for calculatedPrice field
-                 * */
-                double calculatedPrice = quantity * unitPrice;
-
-                /**
-                 * Checking each product's quantity against one in Inventory
-                 * Updating remaining quantity
-                 * */
-                Optional<Inventory> inventoryFound =  inventoryRepository.findByProductIdAndProductSizeIdAndColorId(productId,sizeId,colorId);
-                int inventoryQuantity = inventoryFound.get().getQuantity();
-
-                if( quantity > inventoryQuantity ){
-                    throw new RuntimeException("The product quantity exceeds inventory's");
-                }
-
-                int newInventoryQuantity = inventoryQuantity - quantity;
-
-                /**
-                 * Update new Inventory's quantity
-                 * */
-                inventoryRepository.delete(inventoryFound.get());
-                Inventory newInventory = new Inventory(productId,sizeId,colorId,newInventoryQuantity);
-                inventoryRepository.save(newInventory);
-
-                /**
-                 * Creating and persisting order details model
-                 * */
-                orderDetails.setProductId(productId);
-                orderDetails.setOrderId(orderId);
-                orderDetails.setCalculatedPrice(calculatedPrice);
-                orderDetails.setProductSizeId(sizeId);
-                orderDetails.setColorId(colorId);
-                orderDetails.setOrderId(orderId);
-                orderDetails.setUnitPrice(unitPrice);
-                orderDetails.setQuantity(quantity);
-
-                orderDetailsRepository.save(orderDetails);
-
-                /**
-                 *Preparing totalPrice and totalQuantity for persisting Order
-                 * */
-                totalPrice += calculatedPrice;
-                totalQuantity += quantity;
-            }
-            toGetOrderId.setTotalPrice(totalPrice);
-            toGetOrderId.setTotalQuantity(totalQuantity);
-            orderService.addOrder(toGetOrderId);
-
-            return new OrderIdResponseModel(orderId);
     }
 
     @GetMapping(path = "/order/{orderId}")
@@ -365,9 +368,7 @@ public class OrderController {
         Page<Order> orderPage;
         String token = headerVal.substring(headerVal.indexOf(" "));
 
-        if (!securityUserService.isValidToken(token)) {
-            throw new InvalidTokenException("TOKEN IS INVALID");
-        }
+        tokenValidator.validateTokenUserAuthorization(token);
 
         String securityUserId = jwtProvider.getUserId(token);
 
@@ -375,7 +376,7 @@ public class OrderController {
             throw new TokenUserIdNotFoundException(String.format("USER WITH {userId} NOT FOUND",securityUserId));
         }
 
-        Optional<SecurityUser> user = securityUserRepository.findByPhoneNumber(jwtProvider.getPhone(token));
+        Optional<SecurityUser> user = securityUserService.findByPhoneNumber(jwtProvider.getPhone(token));
 
         if (!user.isPresent()) {
             throw new UserNotFoundException("USER NOT FOUND !");

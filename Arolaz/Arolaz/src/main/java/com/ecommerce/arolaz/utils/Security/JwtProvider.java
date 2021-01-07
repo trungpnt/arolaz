@@ -1,6 +1,8 @@
-package com.ecommerce.arolaz.Security;
+package com.ecommerce.arolaz.utils.Security;
 
 
+import com.ecommerce.arolaz.utils.ExceptionHandlers.ExpiredJwtException;
+import com.ecommerce.arolaz.utils.ExceptionHandlers.InvalidTokenException;
 import com.ecommerce.arolaz.SecurityRole.Model.SecurityRole;
 import com.ecommerce.arolaz.SecurityUser.Model.SecurityUser;
 import io.jsonwebtoken.*;
@@ -64,22 +66,22 @@ public class JwtProvider {
      * Validate the JWT String
      *
      * @param token JWT string
-     * @return true if valid, false otherwise
+     *
+     * @return true if criteria matched
      */
     public boolean isValidToken(String token){
         try{
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return true;
         } catch (MalformedJwtException ex) {
-            LOGGER.error("Invalid JWT token");
+            throw new InvalidTokenException("Invalid token");
         } catch (ExpiredJwtException ex) {
-            LOGGER.error("Expired JWT token");
+            throw new ExpiredJwtException("Expired JWT token");
         } catch (UnsupportedJwtException ex) {
             LOGGER.error("Unsupported JWT token");
         } catch (IllegalArgumentException ex) {
             LOGGER.error("JWT claims string is empty.");
         }
-        return false;
+        return true;
     }
 
     /**

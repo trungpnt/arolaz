@@ -1,4 +1,4 @@
-package com.ecommerce.arolaz.ExceptionHandlers;
+package com.ecommerce.arolaz.utils.ExceptionHandlers;
 
 import java.util.Date;
 

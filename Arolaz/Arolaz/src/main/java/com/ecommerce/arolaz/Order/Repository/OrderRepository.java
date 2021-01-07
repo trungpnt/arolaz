@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface OrderRepository extends PagingAndSortingRepository<Order,ObjectId> {
 
     Page<Order> findBySecurityUserId(@Param("securityUserId") String securityUserId, Pageable pageable);
-
+    Page<Order> findByUnregisteredUserId(@Param("unregisteredUserId") String unregisteredUserId, Pageable pageable);
     @Override
     Iterable<Order> findAll(Sort sort);
 

@@ -1,4 +1,16 @@
 package com.ecommerce.arolaz.UnregisteredUsers.Service;
 
-public class UnregisteredUserServiceImpl {
+import com.ecommerce.arolaz.UnregisteredUsers.Model.UnregisteredUser;
+import com.ecommerce.arolaz.UnregisteredUsers.Repository.UnregisteredUserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UnregisteredUserServiceImpl implements UnregisteredUserService {
+    @Autowired
+    private UnregisteredUserRepository unregisteredUserRepository;
+
+    public UnregisteredUser addNewUnregisteredUser(UnregisteredUser unregisteredUser) {
+        return unregisteredUserRepository.save(unregisteredUser);
+    }
 }

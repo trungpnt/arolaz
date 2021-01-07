@@ -19,7 +19,7 @@ public interface SecurityUserService {
     Optional<SecurityUser>  signInWithToken(String token);
     List<SecurityUser> getAll();
     String extractPhoneFromToken(String token);
-    Boolean isValidToken(String token);
+    void isValidToken(String token);
     void updateUser(SecurityUser securityUser);
 
 }
