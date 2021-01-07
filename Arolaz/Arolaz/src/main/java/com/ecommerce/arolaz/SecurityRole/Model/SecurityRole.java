@@ -63,4 +63,19 @@ public class SecurityRole implements GrantedAuthority {
     public ObjectId getRoleId() {
         return this.roleId;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

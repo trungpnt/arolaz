@@ -7,6 +7,9 @@ import com.ecommerce.arolaz.Category.Model.Category;
 import com.ecommerce.arolaz.Category.Repository.CategoryRepository;
 import com.ecommerce.arolaz.Color.Model.Color;
 import com.ecommerce.arolaz.Color.Repository.ColorRepository;
+import com.ecommerce.arolaz.ExceptionHandlers.AdminRoleNotFoundException;
+import com.ecommerce.arolaz.ExceptionHandlers.InvalidTokenException;
+import com.ecommerce.arolaz.ExceptionHandlers.ProductNotFoundException;
 import com.ecommerce.arolaz.Inventory.Model.Inventory;
 import com.ecommerce.arolaz.Inventory.Repository.InventoryRepository;
 import com.ecommerce.arolaz.Inventory.Service.InventoryService;
@@ -20,6 +23,7 @@ import com.ecommerce.arolaz.ProductSize.Model.ProductSize;
 import com.ecommerce.arolaz.ProductSize.Repository.ProductSizeRepository;
 import com.ecommerce.arolaz.S3BucketFileHandler.ProductImgUrlResponseModel;
 import com.ecommerce.arolaz.S3BucketFileHandler.Service.AWSS3Service;
+import com.ecommerce.arolaz.Security.JwtProvider;
 import com.ecommerce.arolaz.Size.Model.Size;
 import com.ecommerce.arolaz.Size.Repository.SizeRepository;
 import com.ecommerce.arolaz.utils.CustomizedPagingResponseModel;
@@ -36,6 +40,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +62,9 @@ public class ProductController {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private JwtProvider jwtProvider;
 
     @Autowired
     private InventoryRepository inventoryRepository;
@@ -82,13 +90,25 @@ public class ProductController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
 
 
+
+    /**
+     * 1 transaction
+     * 3 database persists
+     * */
     @PostMapping("/product")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('ADMIN')")
-    /**
-     * 3 transactions to complete and wired up in here
-     * */
-    public ResponseEntity<Product> addProduct(@RequestPart(value= "file") final MultipartFile multipartFile, @RequestParam(value="categoryName") String categoryName, @RequestParam(value="brandName") String brandName, @RequestParam(value="productSizeNames") List<String> productSizeNames, @RequestParam(value="productSizePrices") List<Double> productSizePrices, @RequestParam(value="name") String name, @RequestParam(value="availableProductColorNames") List<String> productColorNames,@RequestParam(value = "productQuantities") List<Integer> productQuantities,  @RequestParam(value="description") String description){
+    public ResponseEntity<Product> addProduct(HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal, @RequestPart(value= "file") final MultipartFile multipartFile, @RequestParam(value="categoryName") String categoryName, @RequestParam(value="brandName") String brandName, @RequestParam(value="productSizeNames") List<String> productSizeNames, @RequestParam(value="productSizePrices") List<Double> productSizePrices, @RequestParam(value="name") String name, @RequestParam(value="availableProductColorNames") List<String> productColorNames, @RequestParam(value = "productQuantities") List<Integer> productQuantities, @RequestParam(value="description") String description){
+
+        String token = headerVal.substring(headerVal.indexOf(" "));
+
+        if (!jwtProvider.isValidToken(token)) {
+            throw new InvalidTokenException("TOKEN IS INVALID");
+        }
+        String adminRole = jwtProvider.getRoles(token).get(0).getAuthority();
+        if(adminRole.compareTo("ADMIN") != 0){
+            throw new AdminRoleNotFoundException("TOKEN DOES NOT CONTAIN ADMIN AUTHORITY");
+        }
 
         CreateProductRequestModel createProductRequestModel = new CreateProductRequestModel(categoryName,brandName,productSizeNames,productSizePrices,productQuantities,name,productColorNames,description);
 
@@ -168,9 +188,14 @@ public class ProductController {
     @DeleteMapping("/product/{productId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void deleteProduct(@PathVariable(value = "productId") String productId){
+    public void deleteProductById(@PathVariable(value = "productId") String productId){
         ObjectId proId = new ObjectId(productId);
         Optional<Product> product = productService.findByProductId(proId);
+        if(!product.isPresent()){
+            throw new ProductNotFoundException(String.format("Product with given {proId} not found",productId));
+        }
+
+
         productRepository.delete(product.get());
     }
 

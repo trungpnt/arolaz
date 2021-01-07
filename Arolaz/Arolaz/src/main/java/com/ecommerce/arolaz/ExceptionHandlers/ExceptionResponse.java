@@ -2,6 +2,7 @@ package com.ecommerce.arolaz.ExceptionHandlers;
 
 import java.util.Date;
 
+
 public class ExceptionResponse {
     private Date timeStamp;
     private String message;

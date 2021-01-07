@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @QueryEntity
@@ -22,6 +23,7 @@ public class SecurityUser {
 
     private String email;
 
+    @Size(min = 7)
     private String fullName;
 
     private String phoneNumber;

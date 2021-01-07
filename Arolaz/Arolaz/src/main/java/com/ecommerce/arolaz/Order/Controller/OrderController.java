@@ -363,7 +363,7 @@ public class OrderController {
             HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal) {
 
         Page<Order> orderPage;
-        String token = headerVal.substring(headerVal.indexOf(" "), headerVal.length());
+        String token = headerVal.substring(headerVal.indexOf(" "));
 
         if (!securityUserService.isValidToken(token)) {
             throw new InvalidTokenException("TOKEN IS INVALID");
