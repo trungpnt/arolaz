@@ -48,13 +48,6 @@ public class InventoryController {
         return new ResponseEntity<>(toInventoryQuantityResponseModel(inventory.get()), HttpStatus.OK);
     }
 
-    //LATER
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @PutMapping("/inventory")
-//    public ResponseEntity<InventoryResponseModel> increaseInventoryQuantity(@Valid @RequestBody CreateInventoryRequestModel createInventoryRequestModel){
-//        Inventory persist = modelMapper.map(createInventoryRequestModel,Inventory.class);
-//
-//    }
     private InventoryQuantityResponseModel toInventoryQuantityResponseModel(Inventory inventory){
         return new InventoryQuantityResponseModel(inventory.getInventoryId().toString(),inventory.getQuantity());
     }
@@ -62,10 +55,4 @@ public class InventoryController {
         return new InventoryResponseModel(inventory.getInventoryId().toString(), inventory.getProductId(), inventory.getProductSizeId(), inventory.getColorId(), inventory.getQuantity());
     }
 
-    //LATER
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @PutMapping("/inventory")
-//    public ResponseEntity<InventoryResponseModel> decreaseInventoryQuantity(@Valid @RequestBody CreateInventoryRequestModel createInventoryRequestModel){
-//
-//    }
 }

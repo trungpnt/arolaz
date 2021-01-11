@@ -6,6 +6,7 @@ import com.ecommerce.arolaz.Inventory.Repository.InventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,5 +28,13 @@ public class InventoryServiceImpl implements InventoryService {
         return inventoryRepository.save(inventory);
     }
 
-
+    @Override
+    public String deleteByProductId(String productId){
+        List<Inventory> tryFind = inventoryRepository.findByProductId(productId);
+        if(tryFind.size() == 0){
+            throw new InventoryNotFoundException(String.format("Inventory with '%s' not found !", productId));
+        }
+        inventoryRepository.deleteByProductId(productId);
+        return "DELETED";
+    }
 }

@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface InventoryService {
     Optional<Inventory> findBySizeAndColor(String proId, String sizeId, String colorId);
     Inventory addNewInventory(Inventory inventory);
+    String deleteByProductId(String productId);
 }

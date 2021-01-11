@@ -3,7 +3,7 @@ package com.ecommerce.arolaz.utils.S3BucketFileHandler;
 public class ProductImgUrlResponseModel {
     private String fileName;
     private String imgUrl;
-    protected ProductImgUrlResponseModel(){}
+    public ProductImgUrlResponseModel(){}
 
     public ProductImgUrlResponseModel(String fileName, String imgUrl) {
         this.fileName = fileName;

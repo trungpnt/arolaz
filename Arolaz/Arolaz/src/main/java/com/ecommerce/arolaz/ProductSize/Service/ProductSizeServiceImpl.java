@@ -6,6 +6,7 @@ import com.ecommerce.arolaz.ProductSize.Repository.ProductSizeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,6 +35,25 @@ public class ProductSizeServiceImpl implements ProductSizeService{
             throw new ProductSizeNotFoundException(String.format("product size with '%s','%s' not found",proId,sizeName));
         }
         return find;
+    }
+
+    @Override
+    public List<ProductSize> findByProductId(String proId) {
+        List<ProductSize> tryFind = productSizeRepository.findByProductId(proId);
+        if (tryFind.size() == 0){
+            throw new ProductSizeNotFoundException(String.format("product size with '%s' not found",proId));
+        }
+        return tryFind;
+    }
+
+    @Override
+    public String deleteByProductId(String proId){
+        List<ProductSize> tryFind = findByProductId(proId);
+        if(tryFind.size() == 0){
+            throw new ProductSizeNotFoundException(String.format("product size with '%s' not found",proId));
+        }
+        productSizeRepository.deleteByProductId(proId);
+        return "Deleted";
     }
 
 }

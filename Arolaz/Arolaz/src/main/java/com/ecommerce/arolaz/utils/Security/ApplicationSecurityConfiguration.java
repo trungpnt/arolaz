@@ -16,26 +16,47 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-//@ComponentScan("com.pizza")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private ShopCustomerDetailsService shopCustomerDetailsService;
 
+//    @Autowired
+//    private CustomOAuth2UserService oAuth2UserService;
+//
+//    @Autowired
+//    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
     @Override
     protected void configure( HttpSecurity http ) throws Exception {
-        //entry point
         http
                 .authorizeRequests()
                 .antMatchers("/api/auth/login").permitAll()
                 .antMatchers("/api/auth/register").permitAll()
-                .antMatchers("/api/product/**").permitAll()
+                .antMatchers("/api/products/criteria/v1").permitAll()
+                .antMatchers("/api/products").permitAll()
                 .antMatchers("/api/category/**").permitAll()
                 .antMatchers("/api/size").permitAll()
                 .antMatchers("/api/order/unregistered").permitAll()
                 .antMatchers("/api/inventory/**").permitAll()
-                //disallow anything else
-                .anyRequest().authenticated();
+
+                .antMatchers("/v2/api-docs/**").permitAll()
+                .antMatchers("/swagger-ui/**").permitAll()
+                .antMatchers("/swagger-resources/**/**").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/browser/index.html**").permitAll()
+                .antMatchers("/v3/api-docs").permitAll()
+                .antMatchers("/actuator").permitAll()
+                .antMatchers("http://localhost:8080/swagger-ui/favicon-32x32.png?v=3.0.0").permitAll();
+
+//                .anyRequest().authenticated()
+//                    .and()
+//                    .oauth2Login()
+//                    .loginPage("/login")
+//                    .userInfoEndpoint().userService(oAuth2UserService)
+//                    .and()
+//                    .successHandler(oAuth2LoginSuccessHandler);
+
         http.csrf().disable();
         http.cors();
         //no session will be created or used by spring security
@@ -55,4 +76,11 @@ class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder(11);
     }
 
+//    public CustomOAuth2UserService getoAuth2UserService() {
+//        return oAuth2UserService;
+//    }
+//
+//    public void setoAuth2UserService(CustomOAuth2UserService oAuth2UserService) {
+//        this.oAuth2UserService = oAuth2UserService;
+//    }
 }

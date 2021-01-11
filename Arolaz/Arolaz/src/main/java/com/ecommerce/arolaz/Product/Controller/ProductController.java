@@ -10,17 +10,21 @@ import com.ecommerce.arolaz.Color.Service.ColorService;
 import com.ecommerce.arolaz.Inventory.Model.Inventory;
 import com.ecommerce.arolaz.Inventory.Service.InventoryService;
 import com.ecommerce.arolaz.Product.Model.Product;
+import com.ecommerce.arolaz.Product.Model.ProductSearchCriteria;
 import com.ecommerce.arolaz.Product.RequestResponseModels.CreateProductRequestModel;
 import com.ecommerce.arolaz.Product.RequestResponseModels.ProductResponseModel;
 import com.ecommerce.arolaz.Product.RequestResponseModels.ProductSizePriceQuantityColor;
+import com.ecommerce.arolaz.Product.RequestResponseModels.UpdateProductRequestModel;
+import com.ecommerce.arolaz.Product.RestfulParams.core.FilterCollector;
 import com.ecommerce.arolaz.Product.Service.ProductService;
 import com.ecommerce.arolaz.ProductSize.Model.ProductSize;
 import com.ecommerce.arolaz.ProductSize.Service.ProductSizeService;
-import com.ecommerce.arolaz.utils.S3BucketFileHandler.ProductImgUrlResponseModel;
-import com.ecommerce.arolaz.utils.S3BucketFileHandler.Service.AWSS3Service;
 import com.ecommerce.arolaz.Size.Model.Size;
 import com.ecommerce.arolaz.Size.Service.SizeService;
 import com.ecommerce.arolaz.utils.CustomizedPagingResponseModel;
+import com.ecommerce.arolaz.utils.ExceptionHandlers.ProductIdNotProvidedException;
+import com.ecommerce.arolaz.utils.S3BucketFileHandler.ProductImgUrlResponseModel;
+import com.ecommerce.arolaz.utils.S3BucketFileHandler.Service.AWSS3Service;
 import com.ecommerce.arolaz.utils.TokenValidator;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
@@ -46,6 +50,9 @@ import java.util.stream.Collectors;
 @CrossOrigin
 @RequestMapping("/api")
 public class ProductController {
+    @Autowired
+    private FilterCollector filterCollector;
+
     @Autowired
     private ProductService productService;
 
@@ -84,10 +91,10 @@ public class ProductController {
      * --Persist new ProductSize
      * --Persist new Inventory
      * */
-    @PostMapping("/product")
+    @PostMapping("/products")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Product> addProduct(HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal, @RequestPart(value= "file") final MultipartFile multipartFile, @RequestParam(value="categoryName") String categoryName, @RequestParam(value="brandName") String brandName, @RequestParam(value="productSizeNames") List<String> productSizeNames, @RequestParam(value="productSizePrices") List<Double> productSizePrices, @RequestParam(value="name") String name, @RequestParam(value="availableProductColorNames") List<String> productColorNames, @RequestParam(value = "productQuantities") List<Integer> productQuantities, @RequestParam(value="description") String description){
+    public ResponseEntity<ProductResponseModel> addProduct(HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal, @RequestPart(value= "file") final MultipartFile multipartFile, @RequestParam(value="categoryName") String categoryName, @RequestParam(value="brandName") String brandName, @RequestParam(value="productSizeNames") List<String> productSizeNames, @RequestParam(value="productSizePrices") List<Double> productSizePrices, @RequestParam(value="name") String name, @RequestParam(value="availableProductColorNames") List<String> productColorNames, @RequestParam(value = "productQuantities") List<Integer> productQuantities, @RequestParam(value="description") String description){
 
         String token = headerVal.substring(headerVal.indexOf(" "));
         tokenValidator.validateTokenAdminAuthorization(token);
@@ -147,6 +154,7 @@ public class ProductController {
          * */
         List<ProductSizePriceQuantityColor> listToExtract = afterSaved.getProductSizePriceQuantityColors();
 
+
         for(int i = 0, n = listToExtract.size(); i < n; i++){
             /*
             *Persist product size
@@ -154,6 +162,20 @@ public class ProductController {
             ProductSize persistProductSize = new ProductSize(listToExtract.get(i).getPrice(),listToExtract.get(i).getSizeName(),productId);
             productSizeService.addNewProductSize(persistProductSize);
 
+            /**
+             * Assigning the starting price, color, size for this product
+             * */
+            if(afterSaved.getBasicSmallSizePrice() == null){
+                afterSaved.setBasicSmallSizePrice(listToExtract.get(i).getPrice());
+            }
+
+            if(afterSaved.getBasicColorName() == null){
+                afterSaved.setBasicColorName(listToExtract.get(i).getColorName());
+            }
+
+            if(afterSaved.getBasicSizeName() == null){
+                afterSaved.setBasicSizeName(listToExtract.get(i).getSizeName());
+            }
             /*
              *Persist inventory
              **/
@@ -167,9 +189,10 @@ public class ProductController {
             inventoryService.addNewInventory(persistInventory);
         }
 
-        return new ResponseEntity<>(persistProduct,HttpStatus.CREATED);
-    }
+        productService.addProduct(afterSaved);
 
+        return new ResponseEntity<>(toDto(afterSaved),HttpStatus.CREATED);
+    }
 
     /**
      * Manually map each corresponding JSON fields
@@ -184,35 +207,148 @@ public class ProductController {
         return productSizePriceQuantityColors;
     }
 
-    @PutMapping("/product")
+    List<ProductSizePriceQuantityColor> extractDataAndBuildList(UpdateProductRequestModel updateProductRequestModel){
+        List<ProductSizePriceQuantityColor> productSizePriceQuantityColors = new ArrayList<>();
+        for(int i = 0, n = updateProductRequestModel.getAvailableProductColorNames().size(); i < n; i++){
+            productSizePriceQuantityColors.add(new ProductSizePriceQuantityColor(updateProductRequestModel.getProductSizeNames().get(i),updateProductRequestModel.getProductSizePrices().get(i),updateProductRequestModel.getAvailableProductColorNames().get(i),updateProductRequestModel.getQuantities().get(i)));
+        }
+        return productSizePriceQuantityColors;
+    }
+
+    /**
+     * Should have declared required = false for each request param
+     * */
+    @PutMapping("/products")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<ProductResponseModel> updateProduct(@RequestBody @Valid CreateProductRequestModel createProductRequestModel,HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal){
+    public ResponseEntity<ProductResponseModel> updateProduct(HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal, @RequestPart(value= "file",required = false) final MultipartFile multipartFile, @RequestParam(value = "productId",required = false) String productId, @RequestParam(value="categoryName",required = false) String categoryName, @RequestParam(value="brandName",required = false) String brandName, @RequestParam(value="productSizeNames") List<String> productSizeNames, @RequestParam(value="productSizePrices") List<Double> productSizePrices, @RequestParam(value="name",required = false) String name, @RequestParam(value="availableProductColorNames") List<String> productColorNames, @RequestParam(value = "productQuantities") List<Integer> productQuantities, @RequestParam(value="description",required = false) String description){
         String token = headerVal.substring(headerVal.indexOf(" "));
         tokenValidator.validateTokenAdminAuthorization(token);
 
-        Product product = modelMapper.map(createProductRequestModel, Product.class);
-        Product updatedProduct = productService.addProduct(product);
+        UpdateProductRequestModel updateProductRequestModel = new UpdateProductRequestModel(productId,categoryName,brandName,productSizeNames,productSizePrices,productQuantities,name,productColorNames,description);
 
-        return new ResponseEntity<>(toDto(updatedProduct),HttpStatus.CREATED);
+        if(productId == null){
+            throw new ProductIdNotProvidedException("PLEASE PROVIDE PRODUCT_ID");
+        }
+
+        /**
+         * Finding product with proId
+         * */
+        Optional<Product> toUpdateProduct = productService.findByProductId(new ObjectId(productId));
+
+        /**
+         * Delete records in Inventory and ProductSize with corresponding productId
+         * */
+        productSizeService.deleteByProductId(productId);
+        inventoryService.deleteByProductId(productId);
+
+        ProductImgUrlResponseModel productImgUrlResponseModel = new ProductImgUrlResponseModel();
+        if(!multipartFile.isEmpty()){
+            /**
+             * Upload image file to S3 bucket and combine ImgUrl for product
+             * @param multipartFile
+             * @return imgUrl (https://s3-bucket)
+             * */
+            productImgUrlResponseModel = amsService.uploadFile(multipartFile);
+            final String imgUrl = "[" + multipartFile.getOriginalFilename() + "] uploaded successfully.";
+            productImgUrlResponseModel.setFileName(imgUrl);
+        }
+        toUpdateProduct.get().setImgUrl(productImgUrlResponseModel.getImgUrl());
+        if(name != null){
+            toUpdateProduct.get().setProductName(name);
+        }
+
+        if(categoryName != null){
+            /**
+             * Retrieve CategoryId for product
+             * @param categoryName
+             * @return categoryId
+             * */
+            Optional<Category> foundCategory = categoryService.findByCategoryName(categoryName);
+            toUpdateProduct.get().setCategoryId(foundCategory.get().getCategoryId().toString());
+            toUpdateProduct.get().setCategoryName(categoryName);
+        }
+
+        if(brandName != null){
+            /**
+             * Retrieve brandId for product
+             * @param brandName
+             * @return brandId
+             * */
+            Optional<Brand> foundBrand = brandService.findByBrandName(brandName);
+            toUpdateProduct.get().setBrandId(foundBrand.get().getBrandId().toString());
+            toUpdateProduct.get().setBrandName(brandName);
+        }
+
+        if(description != null){
+            toUpdateProduct.get().setDescription(description);
+        }
+
+        /**
+         * Build ProductSizeQuantityColors for Product model
+         * @param listOfArgs
+         * @return Product with ProductSizePriceQuantityColor
+         * */
+        List<ProductSizePriceQuantityColor> productSizePriceQuantityColors = extractDataAndBuildList(updateProductRequestModel);
+        toUpdateProduct.get().setProductSizePriceQuantityColors(productSizePriceQuantityColors);
+
+        Product afterSaved = productService.addProduct(toUpdateProduct.get());
+
+        String newProductId = afterSaved.getProductId().toString();
+
+        /**
+         * Traverse through each JSON array elements
+         * 1st -- Persist Product Size
+         * 2nd -- Persist Inventory
+         * */
+        List<ProductSizePriceQuantityColor> listToExtract = afterSaved.getProductSizePriceQuantityColors();
+
+        for(int i = 0, n = listToExtract.size(); i < n; i++){
+            /*
+             *Persist product size
+             **/
+            ProductSize persistProductSize = new ProductSize(listToExtract.get(i).getPrice(),listToExtract.get(i).getSizeName(),productId);
+            productSizeService.addNewProductSize(persistProductSize);
+
+            if(toUpdateProduct.get().getBasicSmallSizePrice() == null){
+                toUpdateProduct.get().setBasicSmallSizePrice(listToExtract.get(i).getPrice());
+            }
+
+            /*
+             *Persist inventory
+             **/
+            Optional<Size> foundSize = sizeService.findBySizeName(listToExtract.get(i).getSizeName());
+            String sizeId = foundSize.get().getSizeId().toString();
+
+            Optional<Color> foundColor = colorService.findByColorName(listToExtract.get(i).getColorName());
+            String colorId = foundColor.get().getColorId().toString();
+
+            Inventory persistInventory = new Inventory(productId,sizeId,colorId,listToExtract.get(i).getQuantity());
+            inventoryService.addNewInventory(persistInventory);
+        }
+
+        return new ResponseEntity<>(toDto(toUpdateProduct.get()),HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/product/{productId}")
+    @DeleteMapping("/products/{productId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void deleteProductById(@PathVariable(value = "productId") String productId, HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal){
         String token = headerVal.substring(headerVal.indexOf(" "));
         tokenValidator.validateTokenAdminAuthorization(token);
 
-        ObjectId proId = new ObjectId(productId);
-        Optional<Product> product = productService.findByProductId(proId);
+        Optional<Product> product = productService.findByProductId(new ObjectId(productId));
+
+        productSizeService.deleteByProductId(productId);
+        inventoryService.deleteByProductId(productId);
         productService.deleteProductById(product.get().getProductId());
     }
 
     /**
      * Fetch a list of product with optionally-included CategoryId
      * */
-    @GetMapping(path = "/product")
+    @GetMapping(path = "/products")
+    @ResponseStatus(HttpStatus.OK)
     public CustomizedPagingResponseModel<ProductResponseModel> getProducts(
             @RequestParam("page") Integer page,
             @RequestParam("rows") Integer rows,
@@ -235,10 +371,45 @@ public class ProductController {
         return customizedPagingResponseModel;
     }
 
+    @GetMapping(path = "/products/criteria/v1")
+    @ResponseStatus(HttpStatus.OK)
+    public CustomizedPagingResponseModel<ProductResponseModel> getProducts(@RequestParam( value = "name",required = false) /*Map<String,String> filters*/ String productName, @RequestParam(value = "color",required = false) String colorName, @RequestParam(value = "brand",required = false) String brandName, @RequestParam(value = "price",required = false) Double productPrice, @RequestParam("page") Integer page, @RequestParam("rows") Integer rows, Pageable pageable ){
+
+//        Map<String,String> restApiMongoQueries = filterCollector.collectRestApiParams(filters);
+        ProductSearchCriteria productSearchCriteria = new ProductSearchCriteria();
+        if(productName != null){
+            productSearchCriteria.setProductName(productName);
+        }
+
+        if(colorName != null){
+            productSearchCriteria.setColorName(colorName);
+        }
+
+        if(brandName != null){
+            productSearchCriteria.setBrandName(brandName);
+        }
+
+        if(productPrice != null){
+            productSearchCriteria.setPrice(productPrice);
+        }
+
+        Page<Product> productPage = productService.getCriteriaProductV1(productSearchCriteria);
+
+        List<ProductResponseModel> productResponseModelList = productPage.getContent().stream().map(
+                product -> toDto(product)).collect(Collectors.toList());
+        CustomizedPagingResponseModel<ProductResponseModel> customizedPagingResponseModel = new CustomizedPagingResponseModel<>();
+
+        customizedPagingResponseModel.setPagingData(productResponseModelList);
+        customizedPagingResponseModel.setTotalPage(productPage.getTotalPages());
+
+        return customizedPagingResponseModel;
+    }
+
     private ProductResponseModel toDto(Product product) {
         String productId = product.getProductId().toString();
-        return new ProductResponseModel(productId,product.getProductName(),product.getCategoryName(),product.getImgUrl(),product.getBrandName(),product.getDescription(),product.getProductSizePriceQuantityColors());
+        return new ProductResponseModel(productId,product.getProductName(),product.getCategoryName(),product.getImgUrl(),product.getBrandName(), product.getBasicSmallSizePrice(),product.getDescription(),product.getBasicColorName(),product.getBasicSizeName(), product.getProductSizePriceQuantityColors());
 
     }
+
 
 }

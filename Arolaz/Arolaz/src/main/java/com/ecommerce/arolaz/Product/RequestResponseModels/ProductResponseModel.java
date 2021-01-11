@@ -1,8 +1,5 @@
 package com.ecommerce.arolaz.Product.RequestResponseModels;
 
-import com.ecommerce.arolaz.Color.Model.Color;
-import com.ecommerce.arolaz.ProductSize.Model.ProductSize;
-
 import java.util.List;
 
 /**
@@ -12,7 +9,7 @@ import java.util.List;
 public class ProductResponseModel   {
   private String productId;
 
-  private String name;
+  private String productName;
 
   private String categoryName;
 
@@ -20,29 +17,45 @@ public class ProductResponseModel   {
 
   private String brandName;
 
+  private Double basicSmallSizePrice;
+
   private String description;
+
+  private String basicColorName;
+
+  private String basicSizeName;
 
   private List<ProductSizePriceQuantityColor> productSizePriceQuantityColors;
 
   public ProductResponseModel(){}
 
-  public ProductResponseModel(String productId, String name, String categoryName, String imgUrl, String brandName, String description, List<ProductSizePriceQuantityColor> productSizePriceQuantityColors) {
+  public ProductResponseModel(String productId, String productName, String categoryName, String imgUrl, String brandName, Double basicSmallSizePrice, String description, String basicColorName, String basicSizeName, List<ProductSizePriceQuantityColor> productSizePriceQuantityColors) {
     this.productId = productId;
-    this.name = name;
+    this.productName = productName;
     this.categoryName = categoryName;
     this.imgUrl = imgUrl;
     this.brandName = brandName;
+    this.basicSmallSizePrice = basicSmallSizePrice;
     this.description = description;
+    this.basicColorName = basicColorName;
+    this.basicSizeName = basicSizeName;
     this.productSizePriceQuantityColors = productSizePriceQuantityColors;
   }
 
-  public ProductResponseModel(String name, String categoryName, String imgUrl, String brandName, String description, List<ProductSizePriceQuantityColor> productSizePriceQuantityColors) {
-    this.name = name;
-    this.categoryName = categoryName;
-    this.imgUrl = imgUrl;
-    this.brandName = brandName;
-    this.description = description;
-    this.productSizePriceQuantityColors = productSizePriceQuantityColors;
+  public String getBasicColorName() {
+    return basicColorName;
+  }
+
+  public void setBasicColorName(String basicColorName) {
+    this.basicColorName = basicColorName;
+  }
+
+  public String getBasicSizeName() {
+    return basicSizeName;
+  }
+
+  public void setBasicSizeName(String basicSizeName) {
+    this.basicSizeName = basicSizeName;
   }
 
   public String getProductId() {
@@ -53,12 +66,12 @@ public class ProductResponseModel   {
     this.productId = productId;
   }
 
-  public String getName() {
-    return name;
+  public String getProductName() {
+    return productName;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setProductName(String productName) {
+    this.productName = productName;
   }
 
   public String getCategoryName() {
@@ -85,6 +98,14 @@ public class ProductResponseModel   {
     this.brandName = brandName;
   }
 
+  public Double getBasicSmallSizePrice() {
+    return basicSmallSizePrice;
+  }
+
+  public void setBasicSmallSizePrice(Double basicSmallSizePrice) {
+    this.basicSmallSizePrice = basicSmallSizePrice;
+  }
+
   public String getDescription() {
     return description;
   }
@@ -92,6 +113,7 @@ public class ProductResponseModel   {
   public void setDescription(String description) {
     this.description = description;
   }
+
 
   public List<ProductSizePriceQuantityColor> getProductSizePriceQuantityColors() {
     return productSizePriceQuantityColors;

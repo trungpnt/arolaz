@@ -1,17 +1,18 @@
 package com.ecommerce.arolaz.Product.Model;
 
-import com.ecommerce.arolaz.Color.Model.Color;
 import com.ecommerce.arolaz.Product.RequestResponseModels.ProductSizePriceQuantityColor;
 import com.querydsl.core.annotations.QueryEntity;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import java.util.List;
 
 @QueryEntity
+@QuerydslPredicate
 @Document(collection = "products")
 public class Product {
     @Id
@@ -32,13 +33,20 @@ public class Product {
 
     private String brandName;
 
+    private Double basicSmallSizePrice;
+
     private String productDescription;
+
+    private String basicColorName;
+
+    private String basicSizeName;
 
     private List<ProductSizePriceQuantityColor> productSizePriceQuantityColors;
 
     public Product(){}
 
-    public Product(String categoryId, String brandId, String imgUrl, String description, String productName, String categoryName, String brandName, String productDescription, List<ProductSizePriceQuantityColor> productSizePriceQuantityColors) {
+
+    public Product(String categoryId, String brandId, String imgUrl, String description, String productName, String categoryName, String brandName, Double basicSmallSizePrice, String productDescription, String basicColorName, String basicSizeName, List<ProductSizePriceQuantityColor> productSizePriceQuantityColors) {
         this.categoryId = categoryId;
         this.brandId = brandId;
         this.imgUrl = imgUrl;
@@ -46,7 +54,10 @@ public class Product {
         this.productName = productName;
         this.categoryName = categoryName;
         this.brandName = brandName;
+        this.basicSmallSizePrice = basicSmallSizePrice;
         this.productDescription = productDescription;
+        this.basicColorName = basicColorName;
+        this.basicSizeName = basicSizeName;
         this.productSizePriceQuantityColors = productSizePriceQuantityColors;
     }
 
@@ -110,12 +121,36 @@ public class Product {
         this.brandName = brandName;
     }
 
+    public Double getBasicSmallSizePrice() {
+        return basicSmallSizePrice;
+    }
+
+    public void setBasicSmallSizePrice(Double basicSmallSizePrice) {
+        this.basicSmallSizePrice = basicSmallSizePrice;
+    }
+
     public String getProductDescription() {
         return productDescription;
     }
 
     public void setProductDescription(String productDescription) {
         this.productDescription = productDescription;
+    }
+
+    public String getBasicColorName() {
+        return basicColorName;
+    }
+
+    public void setBasicColorName(String basicColorName) {
+        this.basicColorName = basicColorName;
+    }
+
+    public String getBasicSizeName() {
+        return basicSizeName;
+    }
+
+    public void setBasicSizeName(String basicSizeName) {
+        this.basicSizeName = basicSizeName;
     }
 
     public List<ProductSizePriceQuantityColor> getProductSizePriceQuantityColors() {
