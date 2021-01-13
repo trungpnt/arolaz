@@ -14,7 +14,6 @@ import java.util.Optional;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional

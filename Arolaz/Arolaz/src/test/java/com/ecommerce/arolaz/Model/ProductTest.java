@@ -3,7 +3,7 @@ package com.ecommerce.arolaz.Model;
 
 import com.ecommerce.arolaz.Product.Model.Product;
 import org.bson.types.ObjectId;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
