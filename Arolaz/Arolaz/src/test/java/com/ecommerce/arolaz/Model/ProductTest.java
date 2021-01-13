@@ -3,13 +3,17 @@ package com.ecommerce.arolaz.Model;
 
 import com.ecommerce.arolaz.Product.Model.Product;
 import org.bson.types.ObjectId;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.testng.annotations.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+@RunWith(SpringRunner.class)
 public class ProductTest {
-    private static final ObjectId PRODUCT_ID = new ObjectId("1");
+    private static final String productId = "acb123";
+    private static final ObjectId PRODUCT_ID = new ObjectId(productId);
     private static final String CATEGORY_ID = "4";
     private static final String NAME = "Adidas Hoodie";
     private static final String IMG_URL = "Url Picture";

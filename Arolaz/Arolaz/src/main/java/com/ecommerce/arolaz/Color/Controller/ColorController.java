@@ -45,7 +45,7 @@ public class ColorController {
         return responseModels;
     }
 
-    @PostMapping
+    @PostMapping("/color")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ColorResponseModel> addNewColor(CreateColorRequestModel createColorRequestModel){
         Optional<Color> colorOptional = service.findByColorName(createColorRequestModel.getColorName());

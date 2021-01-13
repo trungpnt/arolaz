@@ -4,6 +4,8 @@ package com.ecommerce.arolaz.Brand.RequestResponseModels;
 public class CreateBrandRequestModel {
   private String brandName;
 
+  public CreateBrandRequestModel(){}
+  
   public CreateBrandRequestModel(String brandName) {
     this.brandName = brandName;
   }

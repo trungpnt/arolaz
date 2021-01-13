@@ -21,6 +21,28 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+
+    @ExceptionHandler(UserWithPhoneNumberAlreadyExistsException.class)
+    public final ResponseEntity<Object> handleUserWithPhoneNumberAlreadyExistsExceptions(UserWithPhoneNumberAlreadyExistsException ex, WebRequest request){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(),ex.getMessage(),request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    @ExceptionHandler(UserRoleNotFoundException.class)
+    public final ResponseEntity<Object> handleUserRoleNotFoundExceptions(UserRoleNotFoundException ex, WebRequest request){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(),ex.getMessage(),request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    @ExceptionHandler(UserWithEmailAlreadyExistsException.class)
+    public final ResponseEntity<Object> handleUserWithEmailAlreadyExistsException(UserWithEmailAlreadyExistsException ex, WebRequest request){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(),ex.getMessage(),request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
     @ExceptionHandler(ProductIdNotProvidedException.class)
     public final ResponseEntity<Object> handleProductIdNotFoundExceptions(ProductIdNotProvidedException ex, WebRequest request){
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(),ex.getMessage(), request.getDescription(false));

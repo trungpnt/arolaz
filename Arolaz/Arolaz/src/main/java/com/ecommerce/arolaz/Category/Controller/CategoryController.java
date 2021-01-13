@@ -6,6 +6,7 @@ import com.ecommerce.arolaz.Category.Repository.CategoryRepository;
 import com.ecommerce.arolaz.Category.RequestResponseModels.CategoryResponseModel;
 import com.ecommerce.arolaz.Category.RequestResponseModels.CreateCategoryRequestModel;
 import com.ecommerce.arolaz.Category.Service.CategoryService;
+import com.ecommerce.arolaz.Utils.ExceptionHandlers.CategoryNotFoundException;
 import com.ecommerce.arolaz.Utils.ObjectCreationSuccessResponse;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
@@ -40,8 +41,8 @@ public class CategoryController {
     public ResponseEntity<ObjectCreationSuccessResponse> createCategory(@Valid @RequestBody CreateCategoryRequestModel createCategoryRequestModel) {
         Category category = modelMapper.map(createCategoryRequestModel,Category.class);
         ObjectCreationSuccessResponse result = new ObjectCreationSuccessResponse();
-        Optional<Category> found = categoryService.findByCategoryName(category.getCategoryName().toUpperCase());
-        if(found.isPresent() ){
+
+        if(categoryService.existsByName(category.getCategoryName())){
             result.setId("CATEGORY WITH THE SAME NAME ALREADY EXISTS");
             result.setResponseCode(HttpStatus.FORBIDDEN.value());
             return new ResponseEntity<ObjectCreationSuccessResponse>(result,HttpStatus.FORBIDDEN);
@@ -52,7 +53,25 @@ public class CategoryController {
         return new ResponseEntity<ObjectCreationSuccessResponse>(result,HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/category")
+    @GetMapping(path = "/category/{categoryName}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<CategoryResponseModel> getCategoryByName(@PathVariable( value = "categoryName") String categoryName) {
+        CategoryResponseModel categoryResponseModel = new CategoryResponseModel();
+        categoryName = categoryName.substring(0,1).toUpperCase() + categoryName.substring(1);
+
+        Optional<Category> category = categoryService.findByCategoryName(categoryName);
+
+        if(category == null){
+            throw new CategoryNotFoundException(String.format("%s not found", categoryName));
+        }
+
+        categoryResponseModel.setId(category.get().getCategoryId().toString());
+        categoryResponseModel.setName(category.get().getCategoryName());
+        categoryResponseModel.setImgUrl(category.get().getImgUrl());
+        return new ResponseEntity<>(categoryResponseModel,HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/categories")
     @ResponseStatus(HttpStatus.OK)
     public List<CategoryResponseModel> getAllCategories() {
         List<CategoryResponseModel> categoryResponseModels;
@@ -67,34 +86,25 @@ public class CategoryController {
         return new CategoryResponseModel(category.getCategoryId().toString(),category.getCategoryName(),category.getImgUrl());
     }
 
-    @GetMapping(path = "/category/{categoryName}")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<CategoryResponseModel> getCategoryByName(@PathVariable( value = "categoryName") String categoryName) {
-        CategoryResponseModel categoryResponseModel = new CategoryResponseModel();
-        categoryName = categoryName.substring(0,1).toUpperCase() + categoryName.substring(1);
-        Optional<Category> category = categoryService.findByCategoryName(categoryName);
-        if(category == null){
-            throw new EntityNotFoundException(categoryName);
-        }
-        categoryResponseModel.setId(category.get().getCategoryId().toString());
-        categoryResponseModel.setName(category.get().getCategoryName());
-        categoryResponseModel.setImgUrl(category.get().getImgUrl());
-        return new ResponseEntity<>(categoryResponseModel,HttpStatus.OK);
-    }
 
     /**
      * Find category by Id
      * */
-    @GetMapping(path="/category/{categoryId}")
-    public CategoryResponseModel findById(@PathVariable("categoryId") String categoryId){
-        ObjectId categoryObjectId = new ObjectId(categoryId);
 
-        Optional<Category> found = categoryRepository.findById(categoryObjectId);
-        if(!found.isPresent()){
-            throw new EntityNotFoundException("Category not found!");
-        }
-        return toDto(found.get());
-    }
+
+    /**
+     * Find category by Id
+     * */
+//    @GetMapping(path="/category/{categoryId}")
+//    public CategoryResponseModel findById(@RequestParam("categoryId") String categoryId){
+//        ObjectId categoryObjectId = new ObjectId(categoryId);
+//
+//        Optional<Category> found = categoryRepository.findById(categoryObjectId);
+//        if(!found.isPresent()){
+//            throw new CategoryNotFoundException("Category not found!");
+//        }
+//        return toDto(found.get());
+//    }
 
 
 }

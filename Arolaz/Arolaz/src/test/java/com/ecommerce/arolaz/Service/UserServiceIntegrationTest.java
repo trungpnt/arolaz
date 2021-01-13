@@ -16,13 +16,12 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@Transactional
 public class UserServiceIntegrationTest {
     @Autowired
     private SecurityUserService service;
     @Test
     public void signup() {
-        Optional<SecurityUser> user = service.signUpForTesting("0904334482", "dummyEmail@gmail.com","dummyFirst dummyLast","dummypassword");
+        Optional<SecurityUser> user = service.signUpForTesting("0904334482", "dummyEmail@gmail.com","dummyFirst dummyLast","@User1234");
         assertThat(user.get().getPassword(), not("dummypassword"));
         System.out.println("Encoded Password = " + user.get().getPassword());
     }

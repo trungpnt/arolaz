@@ -1,6 +1,8 @@
 package com.ecommerce.arolaz.SecurityUser.Service;
 
 import com.ecommerce.arolaz.Utils.ExceptionHandlers.UserNotFoundException;
+import com.ecommerce.arolaz.Utils.ExceptionHandlers.UserWithEmailAlreadyExistsException;
+import com.ecommerce.arolaz.Utils.ExceptionHandlers.UserWithPhoneNumberAlreadyExistsException;
 import com.ecommerce.arolaz.Utils.Security.JwtProvider;
 import com.ecommerce.arolaz.SecurityRole.Model.SecurityRole;
 import com.ecommerce.arolaz.SecurityRole.Repository.SecurityRoleRepository;
@@ -48,6 +50,22 @@ public class SecurityUserServiceImpl implements SecurityUserService {
         this.securityRoleRepository = securityRoleRepository;
     }
 
+    @Override
+    public boolean checkUniqueEmailAndPhoneNumber(String phone, String email){
+        /**
+         * user's EMAIL and PHONE must be unique
+         * */
+        if(securityUserRepository.findByPhoneNumber(phone).isPresent()){
+            throw new UserWithPhoneNumberAlreadyExistsException(String.format("PHONE NUMBER ALREADY EXISTS + '%s'",phone));
+        }
+
+        if(securityUserRepository.findByEmail(email).isPresent()){
+            throw new UserWithEmailAlreadyExistsException(String.format("EMAIL ALREADY EXISTS + '%s'",email));
+        }
+
+        return true;
+    }
+
     /**
      * Create a new user in the database.
      *
@@ -59,31 +77,33 @@ public class SecurityUserServiceImpl implements SecurityUserService {
      */
     @Override
     public Optional<String> signUp(String email, String fullName, String phone, String password, String address) {
+
         LOGGER.info("New user is registering a new account ");
         Optional<SecurityUser> persistUser;
-        Optional<String> token = Optional.empty();
+        Optional<String> token;
+        SecurityRole role;
+
+        //Checking phone and email
+        checkUniqueEmailAndPhoneNumber(phone,email);
 
         /**
-         * Checking user's firstname and explicitly assignin roles
+         * Checking user's fullName and explicitly assignin roles
          * */
-        if (!securityUserRepository.findByPhoneNumber(phone).isPresent() &&
-                !securityUserRepository.findByEmail(email).isPresent()){
-            SecurityRole role;
-            if(fullName.startsWith("Admin")){
-                role = securityRoleRepository.findByRoleName("ADMIN");
-            }
-            else{
-                role = securityRoleRepository.findByRoleName("USER");
-            }
-
-            SecurityUser user = new SecurityUser(email,fullName,phone
-                    ,passwordEncoder.encode(password),address, Arrays.asList(role));
-
-            persistUser = Optional.of(securityUserRepository.save(user));
-            token = Optional.of(jwtProvider.createToken(persistUser,persistUser.get().getRoles()));
-
-            LOGGER.info("token generated {}", token);
+        if(fullName.startsWith("Admin") || fullName.startsWith("ADMIN")){
+            role = securityRoleRepository.findByRoleName("ADMIN");
         }
+        else{
+            role = securityRoleRepository.findByRoleName("USER");
+        }
+
+        SecurityUser user = new SecurityUser(email,fullName,phone
+                ,passwordEncoder.encode(password),address, Arrays.asList(role));
+
+        persistUser = Optional.of(securityUserRepository.save(user));
+        token = Optional.of(jwtProvider.createToken(persistUser,persistUser.get().getRoles()));
+
+        LOGGER.info("token generated {}", token);
+
         return token;
     }
 
@@ -116,13 +136,32 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     }
 
     @Override
+    public Optional<SecurityUser> addNewUser(SecurityUser securityUser){
+        return Optional.of(securityUserRepository.save(securityUser));
+    }
+
+    @Override
+    public Optional<SecurityUser> updateUser(SecurityUser securityUser){
+        return Optional.of(securityUserRepository.save(securityUser));
+    }
+
+    @Override
     public Optional<SecurityUser> findByEmail(String email) {
-        return securityUserRepository.findByEmail(email);
+        Optional<SecurityUser> tryFind = securityUserRepository.findByEmail(email);
+        if(!tryFind.isPresent()){
+            throw new UserNotFoundException(String.format("USER WITH %S NOT FOUND",email));
+        }
+        return tryFind;
     }
 
     @Override
     public Optional<SecurityUser> findByPhoneNumber(String phone) {
-        return securityUserRepository.findByPhoneNumber(phone);
+
+        Optional<SecurityUser> tryFind = securityUserRepository.findByPhoneNumber(phone);
+        if(!tryFind.isPresent()){
+            throw new UserNotFoundException(String.format("USER WITH %S NOT FOUND",phone));
+        }
+        return tryFind;
     }
 
     @Override
@@ -162,6 +201,7 @@ public class SecurityUserServiceImpl implements SecurityUserService {
             }
 
             token = Optional.of(jwtProvider.createToken(user,user.get().getRoles()));
+
             LOGGER.info("token generated {}", token);
         }
         return token;
@@ -169,6 +209,7 @@ public class SecurityUserServiceImpl implements SecurityUserService {
 
     @Override
     public Optional<SecurityUser> signInForTesting(String requiredEntry, String password) {
+
         Optional<SecurityUser> user;
 
         if (isNumeric(requiredEntry)) {
@@ -257,9 +298,5 @@ public class SecurityUserServiceImpl implements SecurityUserService {
         jwtProvider.isValidToken(token);
     }
 
-    @Override
-    public void updateUser(SecurityUser securityUser) {
-        securityUserRepository.save(securityUser);
-    }
 
 }

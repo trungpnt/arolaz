@@ -1,16 +1,12 @@
 package com.ecommerce.arolaz.SecurityUser.Controller;
 
-
-import com.ecommerce.arolaz.UnregisteredUsers.Model.UnregisteredUser;
-import com.ecommerce.arolaz.UnregisteredUsers.Service.UnregisteredUserService;
-import com.ecommerce.arolaz.Utils.ExceptionHandlers.UserNotFoundException;
-import com.ecommerce.arolaz.Utils.Security.JwtProvider;
 import com.ecommerce.arolaz.SecurityUser.Model.SecurityUser;
-import com.ecommerce.arolaz.SecurityUser.Repository.SecurityUserRepository;
 import com.ecommerce.arolaz.SecurityUser.RequestResponseModels.*;
 import com.ecommerce.arolaz.SecurityUser.Service.SecurityUserService;
 import com.ecommerce.arolaz.Utils.CustomizedPagingResponseModel;
+import com.ecommerce.arolaz.Utils.ExceptionHandlers.UserNotFoundException;
 import com.ecommerce.arolaz.Utils.PasswordValidator;
+import com.ecommerce.arolaz.Utils.Security.JwtProvider;
 import com.ecommerce.arolaz.Utils.TokenValidator;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -53,18 +49,22 @@ public class SecurityUserController {
     @Autowired
     private PasswordValidator passwordValidator;
 
-    @PostMapping("/auth/login")
-    public UserTokenResponseModel login(@RequestBody @Valid UserLoginRequestModel userLoginRequestModel) {
+    @PostMapping("/user/signin")
+    public UserTokenResponseModel signIn(@RequestBody @Valid UserLoginRequestModel userLoginRequestModel) {
+
         Optional<String> token = securityUserService.signIn(userLoginRequestModel.getRequiredEntry(), userLoginRequestModel.getPassword());
-        if(!token.isPresent())
+
+        if(!token.isPresent()) {
             throw new HttpServerErrorException((HttpStatus.FORBIDDEN), "Login Failed");
+        }
+
         UserTokenResponseModel userTokenResponseModel = new UserTokenResponseModel();
         userTokenResponseModel.setToken(token.get());
+
         return userTokenResponseModel;
     }
 
-
-    @PostMapping("/auth/register")
+    @PostMapping("/user/signup")
     public ResponseEntity<UserTokenResponseModel> signUp(@RequestBody @Valid CreateUserRequestModel createUserRequestModel) {
 
         if (!passwordValidator.validate(createUserRequestModel.getPassword())){
@@ -76,8 +76,10 @@ public class SecurityUserController {
         if (!token.isPresent()){
             throw new HttpServerErrorException((HttpStatus.FORBIDDEN), "PLEASE CHOOSE A DIFFERENT ACCOUNT!");
         }
+
         UserTokenResponseModel userTokenResponseModel = new UserTokenResponseModel();
         userTokenResponseModel.setToken(token.get());
+
         return new ResponseEntity<>(userTokenResponseModel,HttpStatus.CREATED);
     }
 
@@ -85,6 +87,7 @@ public class SecurityUserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public CustomizedPagingResponseModel<SecurityUserResponseModel> getAllUsers(@RequestParam("page") Integer page,
                                                                                 @RequestParam("rows") Integer rows, Pageable pageable) {
+
         Page<SecurityUser> securityUserPage = securityUserService.findAll(pageable);
         CustomizedPagingResponseModel<SecurityUserResponseModel> securityUserResponseModelCustomizedPagingResponseModel =
                 new CustomizedPagingResponseModel<>();
@@ -101,21 +104,31 @@ public class SecurityUserController {
         return new SecurityUserResponseModel(securityUser.getId().toString(), securityUser.getFullName(),securityUser.getEmail(), securityUser.getPhoneNumber(), securityUser.getAddress(), securityUser.getRoles().get(0).getRoleId().toString());
     }
 
-    @GetMapping("/self")
+    @GetMapping("/user/self")
+    @PreAuthorize("hasAuthority('USER')")
     @ResponseStatus(HttpStatus.OK)
-    public UserLoginResponseModel signInUserByToken(HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal) {
-        String token = headerVal.substring(headerVal.indexOf(" "), headerVal.length());
+    public UserLoginResponseModel signInUserByToken(@RequestHeader(value = "Authorization") String headerVal) {
+
+        String token = headerVal.substring(headerVal.indexOf(" "));
+
+        tokenValidator.validateTokenUserAuthorization(token);
+
         String phone = jwtProvider.getPhone(token);
-        //String username =  jwtProvider.getUsername(token.get());
 
         Optional<SecurityUser> userRepositoryByPhone = securityUserService.findByPhoneNumber(phone);
+
+        if(!userRepositoryByPhone.isPresent()){
+            throw new UserNotFoundException(String.format("USER WITH %s NOT FOUND",phone));
+        }
+
         return new UserLoginResponseModel(userRepositoryByPhone.get().getEmail(), userRepositoryByPhone.get().getFullName(), userRepositoryByPhone.get().getPhoneNumber(), userRepositoryByPhone.get().getAddress());
     }
 
-    @PutMapping("/self/edit")
+    @PutMapping("/user/edit")
     @PreAuthorize("hasAuthority('USER')")
-    public HttpStatus updateUserByToken(HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal, @RequestBody @Valid EditUserRequestModel editUserRequestModel) {
-        String token = headerVal.substring(headerVal.indexOf(" "), headerVal.length());
+    public ResponseEntity<SecurityUserResponseModel> updateUserByToken(HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal, @RequestBody @Valid EditUserRequestModel editUserRequestModel) {
+
+        String token = headerVal.substring(headerVal.indexOf(" "));
         tokenValidator.validateTokenUserAuthorization(token);
         String phoneFromToken = jwtProvider.getPhone(token);
         String userId = jwtProvider.getUserId(token);
@@ -126,52 +139,71 @@ public class SecurityUserController {
             throw new UserNotFoundException(String.format("User with %id not exists",user.get().getId().toString()));
         }
 
-        String email = editUserRequestModel.getEmail();
-        String phone = editUserRequestModel.getPhoneNumber();
+        String newEmail = editUserRequestModel.getEmail();
+        String newPhone = editUserRequestModel.getPhone();
 
-        if(securityUserService.findByEmail(email).isPresent() || securityUserService.findByPhoneNumber(phone).isPresent()){
-            throw new RuntimeException("EMAIL OR PHONE ALREADY EXISTS!!!");
-        }
+        //check unique email and phone
+        securityUserService.checkUniqueEmailAndPhoneNumber(newPhone,newEmail);
 
-        securityUserService.deleteByUserId(user.get().getId());
+        Optional<SecurityUser> toUpdateUser = securityUserService.findByUserId(new ObjectId(userId));
+        toUpdateUser.get().setPhoneNumber(newPhone);
+        toUpdateUser.get().setEmail(newEmail);
 
-        Optional<SecurityUser> preservedUser = securityUserService.findByUserId(new ObjectId(userId));
-        SecurityUser newlyUpdatedUser = toSecurityUser(preservedUser.get(),editUserRequestModel);
-        securityUserService.updateUser(newlyUpdatedUser);
+        Optional<SecurityUser> newlyUpdatedUser = securityUserService.addNewUser(toUpdateUser.get());
 
-        return HttpStatus.ACCEPTED;
+        return new ResponseEntity<>(toDto(newlyUpdatedUser.get()),HttpStatus.CREATED);
     }
+
     private SecurityUser toSecurityUser(SecurityUser securityUser, EditUserRequestModel editUserRequestModel){
         securityUser.setEmail(editUserRequestModel.getEmail());
         securityUser.setFullName(editUserRequestModel.getFullName());
-        securityUser.setPhoneNumber(editUserRequestModel.getPhoneNumber());
+        securityUser.setPhoneNumber(editUserRequestModel.getPhone());
         securityUser.setAddress(editUserRequestModel.getAddress());
         return securityUser;
     }
 
     private SecurityUser toPersistUser(EditUserRequestModel editUserRequestModel){
-        return new SecurityUser(editUserRequestModel.getFullName(), editUserRequestModel.getPhoneNumber(), editUserRequestModel.getAddress(), editUserRequestModel.getPassword(), editUserRequestModel.getEmail());
+        return new SecurityUser(editUserRequestModel.getFullName(), editUserRequestModel.getPhone(), editUserRequestModel.getAddress() , editUserRequestModel.getEmail());
     }
-    @PutMapping("/password")
+
+
+    @PutMapping("/user/edit/password")
     @PreAuthorize("hasAuthority('USER')")
     @ResponseStatus(HttpStatus.OK)
-    public HttpStatus updateUserPasswordByToken(HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal, @RequestBody @Valid EditUserPasswordRequestModel editUserPasswordRequestModel) {
-        String token = headerVal.substring(headerVal.indexOf(" "), headerVal.length());
-        tokenValidator.validateTokenUserAuthorization(token);
-        String phone = jwtProvider.getPhone(token);
+    public ResponseEntity<SecurityUserResponseModel> updateUserPasswordByToken(HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal, @RequestBody @Valid EditUserPasswordRequestModel editUserPasswordRequestModel) {
 
-        Optional<SecurityUser> user = securityUserService.findByPhoneNumber(phone);
-        if (!user.isPresent()) {
-            return HttpStatus.CONFLICT;
+        String token = headerVal.substring(headerVal.indexOf(" "));
+
+        /**
+         * Validate token and role claimed
+         * */
+        tokenValidator.validateTokenUserAuthorization(token);
+
+        String userId = jwtProvider.getUserId(token);
+
+        /**
+         * Search for user's existence
+         * */
+        Optional<SecurityUser> user = securityUserService.findByUserId(new ObjectId(userId));
+
+        /*
+        * * Attempt login with current password
+        * */
+        String requiredEntry = jwtProvider.getPhone(token);
+        String claimedPassword = editUserPasswordRequestModel.getCurrentPassword();
+        Optional<String> attemptToken = securityUserService.signIn(requiredEntry,claimedPassword);
+
+        if(!attemptToken.isPresent()) {
+            throw new HttpServerErrorException((HttpStatus.FORBIDDEN), "Login Failed!");
         }
-        String passwordToCheck = user.get().getPassword();
-        if(passwordToCheck != editUserPasswordRequestModel.getPassword()){
-            throw new RuntimeException("WRONG PASSWORD");
-        }
+
+        /**
+         * Update user's new password
+         * */
         user.get().setPassword(passwordEncoder.encode(editUserPasswordRequestModel.getNewPassword()));
-        SecurityUser newlyUpdatedUser = user.get();
-        securityUserService.delete(securityUserService.findByEmail(user.get().getEmail()).get());
-        securityUserService.updateUser(newlyUpdatedUser);
-        return HttpStatus.OK;
+
+        Optional<SecurityUser> newlyUpdated = securityUserService.updateUser(user.get());
+
+        return new ResponseEntity<>(toDto(newlyUpdated.get()),HttpStatus.CREATED);
     }
 }

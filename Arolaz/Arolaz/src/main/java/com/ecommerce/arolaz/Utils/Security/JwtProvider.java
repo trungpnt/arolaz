@@ -39,7 +39,7 @@ public class JwtProvider {
     }
 
     /**
-     * Create JWT string given username, phone, address.
+     * Create JWT string given fullname, phone, email,id.
      *
      * @param securityUser  : the principal
      * @return jwt string
@@ -50,10 +50,11 @@ public class JwtProvider {
         Claims claims = Jwts.claims().setSubject(securityUser.get().getFullName());
 
         claims.put(ROLE_KEYS, roles.stream().map(role->new SimpleGrantedAuthority(role.getAuthority())).filter(Objects::nonNull).collect(Collectors.toList()));
+
         token = Jwts.builder()
                 .setClaims(claims)
-                .claim("phone", securityUser.get().getPhoneNumber())
-                .claim("name",securityUser.get().getFullName())
+                .claim("phoneNumber", securityUser.get().getPhoneNumber())
+                .claim("fullName",securityUser.get().getFullName())
                 .claim("email", securityUser.get().getEmail())
                 .claim("id", securityUser.get().getId().toString())
                 .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -91,7 +92,7 @@ public class JwtProvider {
      */
 
     public String getPhone(String token){
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("phone",String.class);
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("phoneNumber",String.class);
         //Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
 
     }

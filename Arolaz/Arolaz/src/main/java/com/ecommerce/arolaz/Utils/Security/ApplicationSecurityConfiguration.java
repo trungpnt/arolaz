@@ -31,15 +31,17 @@ class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure( HttpSecurity http ) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/api/user/signin").permitAll()
                 .antMatchers("/api/user/signup").permitAll()
+                .antMatchers("/api/user/signin").permitAll()
                 .antMatchers("/api/products/criteria/v1").permitAll()
                 .antMatchers("/api/products").permitAll()
                 .antMatchers("/api/category/**").permitAll()
+                .antMatchers("api/categories").permitAll()
                 .antMatchers("/api/size").permitAll()
                 .antMatchers("/api/order/unregistered").permitAll()
                 .antMatchers("/api/inventory/**").permitAll()
-
+                .antMatchers("/api/color").permitAll()
+                .antMatchers("/api/brand").permitAll()
                 .antMatchers("/v2/api-docs/**").permitAll()
                 .antMatchers("/swagger-ui/**").permitAll()
                 .antMatchers("/swagger-resources/**/**").permitAll()
@@ -47,9 +49,9 @@ class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/browser/index.html**").permitAll()
                 .antMatchers("/v3/api-docs").permitAll()
                 .antMatchers("/actuator").permitAll()
-                .antMatchers("http://localhost:8080/swagger-ui/favicon-32x32.png?v=3.0.0").permitAll();
+                .antMatchers("http://localhost:8080/swagger-ui/favicon-32x32.png?v=3.0.0").permitAll()
 
-//                .anyRequest().authenticated()
+                .anyRequest().authenticated();
 //                    .and()
 //                    .oauth2Login()
 //                    .loginPage("/login")

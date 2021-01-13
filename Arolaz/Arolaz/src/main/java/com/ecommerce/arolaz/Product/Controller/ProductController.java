@@ -214,10 +214,10 @@ public class ProductController {
     /**
      * Should have declared required = false for each request param
      * */
-    @PutMapping("/products")
+    @PutMapping("/products/{productId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<ProductResponseModel> updateProduct(HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal, @RequestPart(value= "file",required = false) final MultipartFile multipartFile, @RequestParam(value = "productId",required = false) String productId, @RequestParam(value="categoryName",required = false) String categoryName, @RequestParam(value="brandName",required = false) String brandName, @RequestParam(value="productSizeNames") List<String> productSizeNames, @RequestParam(value="productSizePrices") List<Double> productSizePrices, @RequestParam(value="name",required = false) String name, @RequestParam(value="availableProductColorNames") List<String> productColorNames, @RequestParam(value = "productQuantities") List<Integer> productQuantities, @RequestParam(value="description",required = false) String description){
+    public ResponseEntity<ProductResponseModel> updateProduct(@RequestHeader(value = "Authorization") String headerVal, @PathVariable(value = "productId") String productId, @RequestPart(value = "file", required = false) final MultipartFile multipartFile, @RequestParam(value = "categoryName", required = false) String categoryName, @RequestParam(value = "brandName", required = false) String brandName, @RequestParam(value = "productSizeNames") List<String> productSizeNames, @RequestParam(value = "productSizePrices") List<Double> productSizePrices, @RequestParam(value = "name", required = false) String name, @RequestParam(value = "availableProductColorNames") List<String> productColorNames, @RequestParam(value = "productQuantities") List<Integer> productQuantities, @RequestParam(value = "description", required = false) String description){
         String token = headerVal.substring(headerVal.indexOf(" "));
         tokenValidator.validateTokenAdminAuthorization(token);
 

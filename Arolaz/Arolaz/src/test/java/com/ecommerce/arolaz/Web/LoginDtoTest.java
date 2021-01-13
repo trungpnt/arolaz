@@ -2,10 +2,13 @@ package com.ecommerce.arolaz.Web;
 
 import com.ecommerce.arolaz.SecurityUser.RequestResponseModels.LoginDto;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+@RunWith(SpringRunner.class)
 public class LoginDtoTest {
 
     @Test

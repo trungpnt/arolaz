@@ -9,4 +9,5 @@ public interface CategoryService {
     Optional<Category> findByCategoryName(String categoryName);
     Category addCategory(Category category);
     List<Category> getAllCategories();
+    boolean existsByName(String name);
 }

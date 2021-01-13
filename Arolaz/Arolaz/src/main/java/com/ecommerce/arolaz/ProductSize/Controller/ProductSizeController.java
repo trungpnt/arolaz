@@ -37,6 +37,10 @@ public class ProductSizeController {
         return new ResponseEntity<>(toProductSizeResponseModel(persistProductSize), HttpStatus.CREATED);
     }
 
+
+    //GetMapping
+
+
     private ProductSizeResponseModel toProductSizeResponseModel(ProductSize productSize){
         return new ProductSizeResponseModel(productSize.getProductId().toString(), productSize.getProductId(), productSize.getSizeName(), productSize.getPrice());
     }

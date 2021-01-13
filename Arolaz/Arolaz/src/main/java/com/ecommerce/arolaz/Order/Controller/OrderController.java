@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
-@RequestMapping("api/")
+@RequestMapping("/api")
 public class OrderController {
     @Autowired
     private OrderService orderService;
@@ -233,13 +233,13 @@ public class OrderController {
         /***
          * decode TOKEN's and validate against the details
          */
-        String token = headerVal.substring(headerVal.indexOf(" "), headerVal.length());
+        String token = headerVal.substring(headerVal.indexOf(" "));
         tokenValidator.validateTokenUserAuthorization(token);
         String userId = jwtProvider.getUserId(token);
         Optional<SecurityUser> user = securityUserService.findByPhoneNumber(jwtProvider.getPhone(token));
 
         if (!user.isPresent()) {
-            throw new RuntimeException("USER NOT FOUND, PLEASE CHECK YOUR INFORMATION BEFORE PROCEEDING TO ORDER");
+            throw new RuntimeException("USER NOT FOUND, PLEASE CHECK YOUR INFORMATION BEFORE ORDERING");
         }
 
         /**

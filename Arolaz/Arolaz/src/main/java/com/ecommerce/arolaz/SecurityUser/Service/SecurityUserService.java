@@ -20,12 +20,14 @@ public interface SecurityUserService {
     boolean isNumeric (String requiredInput);
     Optional<SecurityUser>  signInWithToken(String token);
     List<SecurityUser> getAll();
+    boolean checkUniqueEmailAndPhoneNumber(String phone, String email);
+    Optional<SecurityUser> addNewUser(SecurityUser securityUser);
     String extractPhoneFromToken(String token);
     void isValidToken(String token);
     Optional<SecurityUser> signUpForTesting(String phone, String email, String fullName, String password);
-    void updateUser(SecurityUser securityUser);
     void delete(SecurityUser securityUser);
     void deleteByUserId(ObjectId userId);
+    Optional<SecurityUser> updateUser(SecurityUser securityUser);
     Optional<SecurityUser> findByUserId(ObjectId userId);
     Page<SecurityUser> findAll(Pageable pageable);
 }

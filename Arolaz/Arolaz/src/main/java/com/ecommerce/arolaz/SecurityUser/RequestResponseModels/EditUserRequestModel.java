@@ -6,27 +6,17 @@ public class EditUserRequestModel {
 
   private String fullName;
 
-  private String phoneNumber;
+  private String phone;
 
   private String address;
 
-  private String password;
-
-  public String getPassword() {
-    return password;
+  public EditUserRequestModel() {
   }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  protected EditUserRequestModel() {
-  }
-
-  public EditUserRequestModel(String email, String fullName, String phoneNumber, String address) {
+  public EditUserRequestModel(String email, String fullName, String phone, String address) {
     this.email = email;
     this.fullName = fullName;
-    this.phoneNumber = phoneNumber;
+    this.phone = phone;
     this.address = address;
   }
 
@@ -46,12 +36,12 @@ public class EditUserRequestModel {
     this.fullName = fullName;
   }
 
-  public String getPhoneNumber() {
-    return phoneNumber;
+  public String getPhone() {
+    return phone;
   }
 
-  public void setPhoneNumber(String phoneNumber) {
-    this.phoneNumber = phoneNumber;
+  public void setPhone(String phone) {
+    this.phone = phone;
   }
 
   public String getAddress() {
