@@ -1,13 +1,17 @@
 package com.ecommerce.arolaz.SecurityUser.Service;
 
-import com.ecommerce.arolaz.utils.Security.JwtProvider;
+import com.ecommerce.arolaz.Utils.ExceptionHandlers.UserNotFoundException;
+import com.ecommerce.arolaz.Utils.Security.JwtProvider;
 import com.ecommerce.arolaz.SecurityRole.Model.SecurityRole;
 import com.ecommerce.arolaz.SecurityRole.Repository.SecurityRoleRepository;
 import com.ecommerce.arolaz.SecurityUser.Model.SecurityUser;
 import com.ecommerce.arolaz.SecurityUser.Repository.SecurityUserRepository;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -83,18 +87,32 @@ public class SecurityUserServiceImpl implements SecurityUserService {
         return token;
     }
 
+
     @Override
-    public Optional<SecurityUser> signUpToUser(String phone, String email, String firstName, String lastName, String password) {
+    public Optional<SecurityUser> signUpForTesting(String phone, String email, String fullName, String password) {
         Optional<SecurityUser> user = null;
 
-//        if (!securityUserRepository.findByPhone(phone).isPresent() &&
-//                !securityUserRepository.findByEmail(email).isPresent()){
-//
-//            user = Optional.of(securityUserRepository.save(new SecurityUser(
-//                    phone, passwordEncoder.encode(password), lastName,
-//                    firstName,email)));
-//        }
+        if (!securityUserRepository.findByPhoneNumber(phone).isPresent() &&
+                !securityUserRepository.findByEmail(email).isPresent()){
+
+            user = Optional.of(securityUserRepository.save(new SecurityUser(
+                    phone, email, fullName, passwordEncoder.encode(password))));
+        }
         return user;
+    }
+
+    @Override
+    public Optional<SecurityUser> findByUserId(ObjectId userId){
+        Optional<SecurityUser> tryFind = securityUserRepository.findById(userId);
+        if(!tryFind.isPresent()){
+            throw new UserNotFoundException(String.format("USER WITH '%s' NOT FOUND",userId.toString()));
+        }
+        return tryFind;
+    }
+
+    @Override
+    public Page<SecurityUser> findAll(Pageable pageable){
+        return securityUserRepository.findAll(pageable);
     }
 
     @Override
@@ -150,7 +168,7 @@ public class SecurityUserServiceImpl implements SecurityUserService {
     }
 
     @Override
-    public Optional<SecurityUser> signInToUser(String requiredEntry, String password) {
+    public Optional<SecurityUser> signInForTesting(String requiredEntry, String password) {
         Optional<SecurityUser> user;
 
         if (isNumeric(requiredEntry)) {
@@ -172,6 +190,17 @@ public class SecurityUserServiceImpl implements SecurityUserService {
             }
         }
         return user;
+    }
+
+
+    @Override
+    public void delete(SecurityUser securityUser){
+        securityUserRepository.delete(securityUser);
+    }
+
+    @Override
+    public void deleteByUserId(ObjectId userId){
+        securityUserRepository.deleteById(userId);
     }
 
     public String formatToken(Optional<String> token){

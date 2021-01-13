@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface SecurityUserRepository extends PagingAndSortingRepository<SecurityUser, ObjectId> {
     Optional<SecurityUser> findByEmail(String email);
     Optional<SecurityUser> findByPhoneNumber(String phone);
-    Optional<SecurityUser> findByFullName(String firstName);
+    Optional<SecurityUser> findByFullName(String fullName);
 
     @Override
     Iterable<SecurityUser> findAll(Sort sort);

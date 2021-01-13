@@ -50,12 +50,11 @@ public class ColorController {
     public ResponseEntity<ColorResponseModel> addNewColor(CreateColorRequestModel createColorRequestModel){
         Optional<Color> colorOptional = service.findByColorName(createColorRequestModel.getColorName());
         if(colorOptional.isPresent()){
-            throw new RuntimeException("Color name already exists !");
+            throw new RuntimeException("Color name already exists !".toUpperCase());
         }
         Color persistColor = modelMapper.map(createColorRequestModel,Color.class);
         service.addNewColor(persistColor);
         return new ResponseEntity<>(toColorResponseModel(persistColor),HttpStatus.CREATED);
     }
-
 
 }

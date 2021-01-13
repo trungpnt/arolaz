@@ -6,7 +6,8 @@ import com.ecommerce.arolaz.SecurityRole.Repository.SecurityRoleRepository;
 import com.ecommerce.arolaz.SecurityRole.RequestResponseModels.CreateRoleRequestModel;
 import com.ecommerce.arolaz.SecurityRole.RequestResponseModels.RoleResponseModel;
 import com.ecommerce.arolaz.SecurityRole.Service.SecurityRoleService;
-import com.ecommerce.arolaz.utils.CustomizedPagingResponseModel;
+import com.ecommerce.arolaz.SecurityUser.Service.SecurityUserService;
+import com.ecommerce.arolaz.Utils.CustomizedPagingResponseModel;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,9 +32,6 @@ public class SecurityRoleController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Autowired
-    private SecurityRoleRepository securityRoleRepository;
-
     @PostMapping(path="/role")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
@@ -53,7 +51,7 @@ public class SecurityRoleController {
     @ResponseStatus(HttpStatus.OK)
     public CustomizedPagingResponseModel<RoleResponseModel> getAllRoles(Pageable pageable)
     {
-        Page<SecurityRole> securityRolePage = securityRoleRepository.findAll(pageable);
+        Page<SecurityRole> securityRolePage = securityRoleService.findAll(pageable);
 
         CustomizedPagingResponseModel<RoleResponseModel> pagingResponseModel = new CustomizedPagingResponseModel<>();
         List<RoleResponseModel> roleResponseModelList = securityRolePage.getContent().stream().map(
@@ -74,7 +72,7 @@ public class SecurityRoleController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<RoleResponseModel> findRoleByName(@RequestParam("roleName") String roleName){
         RoleResponseModel roleResponseModel = new RoleResponseModel();
-        SecurityRole securityRole = securityRoleRepository.findByRoleName(roleName.toUpperCase());
+        SecurityRole securityRole = securityRoleService.findRoleByName(roleName.toUpperCase());
 
         if(securityRole == null){
             throw new EntityNotFoundException(roleName);

@@ -1,6 +1,6 @@
 package com.ecommerce.arolaz.Size.Service;
 
-import com.ecommerce.arolaz.utils.ExceptionHandlers.SizeNotFoundException;
+import com.ecommerce.arolaz.Utils.ExceptionHandlers.SizeNotFoundException;
 import com.ecommerce.arolaz.Size.Model.Size;
 import com.ecommerce.arolaz.Size.Repository.SizeRepository;
 import org.bson.types.ObjectId;

@@ -1,6 +1,6 @@
 package com.ecommerce.arolaz.Inventory.Service;
 
-import com.ecommerce.arolaz.utils.ExceptionHandlers.InventoryNotFoundException;
+import com.ecommerce.arolaz.Utils.ExceptionHandlers.InventoryNotFoundException;
 import com.ecommerce.arolaz.Inventory.Model.Inventory;
 import com.ecommerce.arolaz.Inventory.Repository.InventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;

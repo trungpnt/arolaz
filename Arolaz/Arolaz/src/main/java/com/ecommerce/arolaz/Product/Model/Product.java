@@ -61,6 +61,24 @@ public class Product {
         this.productSizePriceQuantityColors = productSizePriceQuantityColors;
     }
 
+    //For unit testing
+    public Product(ObjectId productId, String name, Double basicSmallSizePrice, String imgUrl, String description) {
+        this.productId = productId;
+        this.imgUrl = imgUrl;
+        this.productName = productName;
+        this.basicSmallSizePrice = basicSmallSizePrice;
+        this.productDescription = productDescription;
+    }
+
+    public Product(ObjectId productId, String categoryId, String name, Double basicSmallSizePrice, String imgUrl, String description) {
+        this.productId = productId;
+        this.imgUrl = imgUrl;
+        this.productName = name;
+        this.basicSmallSizePrice = basicSmallSizePrice;
+        this.productDescription = description;
+        this.categoryId = categoryId;
+    }
+
     public ObjectId getProductId() {
         return productId;
     }

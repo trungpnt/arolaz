@@ -2,7 +2,7 @@ package com.ecommerce.arolaz.Category.Service;
 
 import com.ecommerce.arolaz.Category.Model.Category;
 import com.ecommerce.arolaz.Category.Repository.CategoryRepository;
-import com.ecommerce.arolaz.utils.ExceptionHandlers.CategoryNotFoundException;
+import com.ecommerce.arolaz.Utils.ExceptionHandlers.CategoryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

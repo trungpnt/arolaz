@@ -6,7 +6,7 @@ import com.ecommerce.arolaz.Category.Repository.CategoryRepository;
 import com.ecommerce.arolaz.Category.RequestResponseModels.CategoryResponseModel;
 import com.ecommerce.arolaz.Category.RequestResponseModels.CreateCategoryRequestModel;
 import com.ecommerce.arolaz.Category.Service.CategoryService;
-import com.ecommerce.arolaz.utils.ObjectCreationSuccessResponse;
+import com.ecommerce.arolaz.Utils.ObjectCreationSuccessResponse;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,12 +62,6 @@ public class CategoryController {
 
         return categoryResponseModels;
     }
-   /* @GetMapping(path = "/category")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Category> getAllCategories() {
-
-        return categoryService.getAllCategories();
-    }*/
 
     public CategoryResponseModel toDto(Category category){
         return new CategoryResponseModel(category.getCategoryId().toString(),category.getCategoryName(),category.getImgUrl());

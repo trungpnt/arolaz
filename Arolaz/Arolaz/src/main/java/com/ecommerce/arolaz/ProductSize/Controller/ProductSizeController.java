@@ -23,9 +23,6 @@ public class ProductSizeController {
     private ProductSizeService service;
 
     @Autowired
-    private ProductSizeRepository repository;
-
-    @Autowired
     private ModelMapper modelMapper;
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -35,24 +32,13 @@ public class ProductSizeController {
 
         Optional<ProductSize> foundProductSize = service.findByProductIdAndSizeNameAndPrice(createProductSizeRequestModel.getProductId(), createProductSizeRequestModel.getSizeName(), createProductSizeRequestModel.getPrice());
 
-        if(foundProductSize.isPresent()){
-            throw new RuntimeException("Product Size with given props already exists!!!");
-        }
         service.addNewProductSize(persistProductSize);
 
         return new ResponseEntity<>(toProductSizeResponseModel(persistProductSize), HttpStatus.CREATED);
     }
 
-//    @GetMapping("/product-size")
-//    public ResponseEntity<List<ProductSizeResponseModel>> getAllProductSizes(){
-//        List<ProductSize> found = (List<ProductSize>) repository.findAll();
-//
-//    }
-
     private ProductSizeResponseModel toProductSizeResponseModel(ProductSize productSize){
         return new ProductSizeResponseModel(productSize.getProductId().toString(), productSize.getProductId(), productSize.getSizeName(), productSize.getPrice());
     }
-//    private List<ProductSizeResponseModel> toProductSizeResponseModelList(List<ProductSize>){
-//
-//    }
+
 }

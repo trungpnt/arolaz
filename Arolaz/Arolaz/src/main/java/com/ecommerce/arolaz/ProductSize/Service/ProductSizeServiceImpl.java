@@ -1,6 +1,6 @@
 package com.ecommerce.arolaz.ProductSize.Service;
 
-import com.ecommerce.arolaz.utils.ExceptionHandlers.ProductSizeNotFoundException;
+import com.ecommerce.arolaz.Utils.ExceptionHandlers.ProductSizeNotFoundException;
 import com.ecommerce.arolaz.ProductSize.Model.ProductSize;
 import com.ecommerce.arolaz.ProductSize.Repository.ProductSizeRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,24 +1,23 @@
 package com.ecommerce.arolaz.SecurityUser.Controller;
 
 
-import com.ecommerce.arolaz.utils.ExceptionHandlers.UserNotFoundException;
-import com.ecommerce.arolaz.utils.Security.JwtProvider;
-import com.ecommerce.arolaz.SecurityRole.Repository.SecurityRoleRepository;
+import com.ecommerce.arolaz.UnregisteredUsers.Model.UnregisteredUser;
+import com.ecommerce.arolaz.UnregisteredUsers.Service.UnregisteredUserService;
+import com.ecommerce.arolaz.Utils.ExceptionHandlers.UserNotFoundException;
+import com.ecommerce.arolaz.Utils.Security.JwtProvider;
 import com.ecommerce.arolaz.SecurityUser.Model.SecurityUser;
 import com.ecommerce.arolaz.SecurityUser.Repository.SecurityUserRepository;
 import com.ecommerce.arolaz.SecurityUser.RequestResponseModels.*;
 import com.ecommerce.arolaz.SecurityUser.Service.SecurityUserService;
-import com.ecommerce.arolaz.utils.CustomizedPagingResponseModel;
-import com.ecommerce.arolaz.utils.PasswordValidator;
-import com.ecommerce.arolaz.utils.TokenValidator;
+import com.ecommerce.arolaz.Utils.CustomizedPagingResponseModel;
+import com.ecommerce.arolaz.Utils.PasswordValidator;
+import com.ecommerce.arolaz.Utils.TokenValidator;
 import org.bson.types.ObjectId;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,16 +32,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-//@Slf4j
 @CrossOrigin
 @RequestMapping("/api")
 public class SecurityUserController {
-
-    @Autowired
-    private MongoOperations mongoOperations;
-
-    @Autowired
-    private ModelMapper modelMapper;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SecurityUserController.class);
 
@@ -54,12 +46,6 @@ public class SecurityUserController {
 
     @Autowired
     private JwtProvider jwtProvider;
-
-    @Autowired
-    private SecurityUserRepository securityUserRepository;
-
-    @Autowired
-    private SecurityRoleRepository securityRoleRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -82,34 +68,24 @@ public class SecurityUserController {
     public ResponseEntity<UserTokenResponseModel> signUp(@RequestBody @Valid CreateUserRequestModel createUserRequestModel) {
 
         if (!passwordValidator.validate(createUserRequestModel.getPassword())){
-            throw new HttpServerErrorException(HttpStatus.FORBIDDEN, "Please choose another password!") ;
+            throw new HttpServerErrorException(HttpStatus.FORBIDDEN, "PASSWORD MUST CONTAIN AT LEAST ONE NUMBER, ONE LOWERCASE AND UPPERCASE LETTER, ONE SPECIAL CHARACTER, AND CONTAIN AT LEAST 8 CHARACTERS!");
         }
 
         Optional<String> token = securityUserService.signUp(createUserRequestModel.getEmail(), createUserRequestModel.getFullName(),createUserRequestModel.getPhone(), createUserRequestModel.getPassword(), createUserRequestModel.getAddress());
 
         if (!token.isPresent()){
-            throw new HttpServerErrorException((HttpStatus.FORBIDDEN), "Please choose a different account!");
+            throw new HttpServerErrorException((HttpStatus.FORBIDDEN), "PLEASE CHOOSE A DIFFERENT ACCOUNT!");
         }
         UserTokenResponseModel userTokenResponseModel = new UserTokenResponseModel();
         userTokenResponseModel.setToken(token.get());
         return new ResponseEntity<>(userTokenResponseModel,HttpStatus.CREATED);
     }
 
-//    @GetMapping("/users")
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    public Page<SecurityUserResponseModel> getAllUsers(@RequestParam("page") Integer page,
-//                                                       @RequestParam("rows") Integer rows, Pageable pageable) {
-//        Page<SecurityUser> securityUserPage = securityUserRepository.findAll(pageable);
-//                List<SecurityUserResponseModel> securityUserList = securityUserPage.getContent().stream().map(
-//                securityUser -> toDto(securityUser)).collect(Collectors.toList());
-//        return new PageImpl<SecurityUserResponseModel>(securityUserList, pageable, securityUserPage.getTotalPages());
-//    }
-
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('ADMIN')")
     public CustomizedPagingResponseModel<SecurityUserResponseModel> getAllUsers(@RequestParam("page") Integer page,
                                                                                 @RequestParam("rows") Integer rows, Pageable pageable) {
-        Page<SecurityUser> securityUserPage = securityUserRepository.findAll(pageable);
+        Page<SecurityUser> securityUserPage = securityUserService.findAll(pageable);
         CustomizedPagingResponseModel<SecurityUserResponseModel> securityUserResponseModelCustomizedPagingResponseModel =
                 new CustomizedPagingResponseModel<>();
 
@@ -132,7 +108,7 @@ public class SecurityUserController {
         String phone = jwtProvider.getPhone(token);
         //String username =  jwtProvider.getUsername(token.get());
 
-        Optional<SecurityUser> userRepositoryByPhone = securityUserRepository.findByPhoneNumber(phone);
+        Optional<SecurityUser> userRepositoryByPhone = securityUserService.findByPhoneNumber(phone);
         return new UserLoginResponseModel(userRepositoryByPhone.get().getEmail(), userRepositoryByPhone.get().getFullName(), userRepositoryByPhone.get().getPhoneNumber(), userRepositoryByPhone.get().getAddress());
     }
 
@@ -144,23 +120,22 @@ public class SecurityUserController {
         String phoneFromToken = jwtProvider.getPhone(token);
         String userId = jwtProvider.getUserId(token);
 
-        Optional<SecurityUser> user = securityUserRepository.findByPhoneNumber(phoneFromToken);
+        Optional<SecurityUser> user = securityUserService.findByPhoneNumber(phoneFromToken);
 
         if (!user.isPresent()) {
-            String notFoundUserId = user.get().getId().toString();
-            throw new UserNotFoundException(String.format("User with %id not exists",notFoundUserId));
+            throw new UserNotFoundException(String.format("User with %id not exists",user.get().getId().toString()));
         }
+
         String email = editUserRequestModel.getEmail();
         String phone = editUserRequestModel.getPhoneNumber();
 
-        if(securityUserRepository.findByEmail(email).isPresent() || securityUserRepository.findByPhoneNumber(phone).isPresent()){
-            throw new RuntimeException("Email or Phone has already existed!");
+        if(securityUserService.findByEmail(email).isPresent() || securityUserService.findByPhoneNumber(phone).isPresent()){
+            throw new RuntimeException("EMAIL OR PHONE ALREADY EXISTS!!!");
         }
 
-        ObjectId userIdToDelete = new ObjectId(userId);
-        Optional<SecurityUser> preservedUser = securityUserRepository.findById(userIdToDelete);
+        securityUserService.deleteByUserId(user.get().getId());
 
-        securityUserRepository.deleteById(userIdToDelete);
+        Optional<SecurityUser> preservedUser = securityUserService.findByUserId(new ObjectId(userId));
         SecurityUser newlyUpdatedUser = toSecurityUser(preservedUser.get(),editUserRequestModel);
         securityUserService.updateUser(newlyUpdatedUser);
 
@@ -185,7 +160,7 @@ public class SecurityUserController {
         tokenValidator.validateTokenUserAuthorization(token);
         String phone = jwtProvider.getPhone(token);
 
-        Optional<SecurityUser> user = securityUserRepository.findByPhoneNumber(phone);
+        Optional<SecurityUser> user = securityUserService.findByPhoneNumber(phone);
         if (!user.isPresent()) {
             return HttpStatus.CONFLICT;
         }
@@ -195,7 +170,7 @@ public class SecurityUserController {
         }
         user.get().setPassword(passwordEncoder.encode(editUserPasswordRequestModel.getNewPassword()));
         SecurityUser newlyUpdatedUser = user.get();
-        securityUserRepository.delete(securityUserRepository.findByEmail(user.get().getEmail()).get());
+        securityUserService.delete(securityUserService.findByEmail(user.get().getEmail()).get());
         securityUserService.updateUser(newlyUpdatedUser);
         return HttpStatus.OK;
     }

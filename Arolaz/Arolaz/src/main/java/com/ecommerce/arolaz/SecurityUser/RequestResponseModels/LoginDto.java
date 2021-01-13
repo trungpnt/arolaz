@@ -3,16 +3,25 @@ package com.ecommerce.arolaz.SecurityUser.RequestResponseModels;
 import javax.validation.constraints.NotNull;
 
 public class LoginDto {
-    @NotNull
     private String phone;
 
-    public LoginDto(@NotNull String phone, @NotNull String email, @NotNull String password, String firstName, String lastName){
+    private String email;
+
+    private String fullName;
+
+    private String password;
+
+    public LoginDto(){}
+    public LoginDto(String phone, String email, String fullName, String password) {
         this.phone = phone;
         this.email = email;
+        this.fullName = fullName;
         this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
+    }
 
+    public LoginDto(String email, String password) {
+        this.email = email;
+        this.password = password;
     }
 
     public String getPhone() {
@@ -31,70 +40,12 @@ public class LoginDto {
         this.email = email;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    @NotNull
-    private String email;
-
-    @NotNull
-    private String password;
-
-    public LoginDto(@NotNull String phone, @NotNull String email, @NotNull String password) {
-        this.phone = phone;
-        this.email = email;
-        this.password = password;
-    }
-
-    private String firstName;
-
-    private String lastName;
-
-    private String username;
-
-    /**
-     * Default constructor
-     */
-    protected LoginDto() {
-    }
-
-    /**
-     * Partial constructor
-     * @param username
-     * @param password
-     */
-    public LoginDto(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    private String returnUsername(String s){
-        return username = s;
-    }
-
-    /**
-     * Full constructor
-     * @param username
-     * @param password
-     */
-    public LoginDto(String username, String password, String firstName, String lastName) {
-        this(username, password);
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getPassword() {
@@ -103,13 +54,5 @@ public class LoginDto {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
     }
 }

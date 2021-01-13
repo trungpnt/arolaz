@@ -13,8 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends PagingAndSortingRepository<Product, ObjectId>{
-    Page<Product> findByCategoryId(/*@Param("categoryId")*/ String categoryId, Pageable pageable);
-    //Product findByProductId(@Param("productId") String productId);
+    Page<Product> findByCategoryId(String categoryId, Pageable pageable);
     Optional<Product> findByProductId(ObjectId productId);
     Page<Product> findAll(Pageable pageable);
     @Override

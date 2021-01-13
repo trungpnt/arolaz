@@ -10,7 +10,7 @@ import com.ecommerce.arolaz.Color.Service.ColorService;
 import com.ecommerce.arolaz.Inventory.Model.Inventory;
 import com.ecommerce.arolaz.Inventory.Service.InventoryService;
 import com.ecommerce.arolaz.Product.Model.Product;
-import com.ecommerce.arolaz.Product.Model.ProductSearchCriteria;
+import com.ecommerce.arolaz.Product.Model.ProductDynamicQuery;
 import com.ecommerce.arolaz.Product.RequestResponseModels.CreateProductRequestModel;
 import com.ecommerce.arolaz.Product.RequestResponseModels.ProductResponseModel;
 import com.ecommerce.arolaz.Product.RequestResponseModels.ProductSizePriceQuantityColor;
@@ -21,11 +21,11 @@ import com.ecommerce.arolaz.ProductSize.Model.ProductSize;
 import com.ecommerce.arolaz.ProductSize.Service.ProductSizeService;
 import com.ecommerce.arolaz.Size.Model.Size;
 import com.ecommerce.arolaz.Size.Service.SizeService;
-import com.ecommerce.arolaz.utils.CustomizedPagingResponseModel;
-import com.ecommerce.arolaz.utils.ExceptionHandlers.ProductIdNotProvidedException;
-import com.ecommerce.arolaz.utils.S3BucketFileHandler.ProductImgUrlResponseModel;
-import com.ecommerce.arolaz.utils.S3BucketFileHandler.Service.AWSS3Service;
-import com.ecommerce.arolaz.utils.TokenValidator;
+import com.ecommerce.arolaz.Utils.CustomizedPagingResponseModel;
+import com.ecommerce.arolaz.Utils.ExceptionHandlers.ProductIdNotProvidedException;
+import com.ecommerce.arolaz.Utils.S3BucketFileHandler.ProductImgUrlResponseModel;
+import com.ecommerce.arolaz.Utils.S3BucketFileHandler.Service.AWSS3Service;
+import com.ecommerce.arolaz.Utils.TokenValidator;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -40,7 +40,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -373,27 +372,32 @@ public class ProductController {
 
     @GetMapping(path = "/products/criteria/v1")
     @ResponseStatus(HttpStatus.OK)
-    public CustomizedPagingResponseModel<ProductResponseModel> getProducts(@RequestParam( value = "name",required = false) /*Map<String,String> filters*/ String productName, @RequestParam(value = "color",required = false) String colorName, @RequestParam(value = "brand",required = false) String brandName, @RequestParam(value = "price",required = false) Double productPrice, @RequestParam("page") Integer page, @RequestParam("rows") Integer rows, Pageable pageable ){
+    public CustomizedPagingResponseModel<ProductResponseModel> getProducts(@RequestParam( value = "name",required = false) /*Map<String,String> filters*/ String productName, @RequestParam(value = "color",required = false) String colorName, @RequestParam(value = "brand",required = false) String brandName, @RequestParam(value = "price",required = false) Double productPrice, @RequestParam(value="sortBy") String sortBy, @RequestParam("page") Integer page, @RequestParam("rows") Integer rows, Pageable pageable ){
 
 //        Map<String,String> restApiMongoQueries = filterCollector.collectRestApiParams(filters);
-        ProductSearchCriteria productSearchCriteria = new ProductSearchCriteria();
+        ProductDynamicQuery productDynamicQuery = new ProductDynamicQuery();
+
+        if(sortBy != null){
+            productDynamicQuery.setSortBy(sortBy);
+        }
+
         if(productName != null){
-            productSearchCriteria.setProductName(productName);
+            productDynamicQuery.setProductName(productName);
         }
 
         if(colorName != null){
-            productSearchCriteria.setColorName(colorName);
+            productDynamicQuery.setColorName(colorName);
         }
 
         if(brandName != null){
-            productSearchCriteria.setBrandName(brandName);
+            productDynamicQuery.setBrandName(brandName);
         }
 
         if(productPrice != null){
-            productSearchCriteria.setPrice(productPrice);
+            productDynamicQuery.setPrice(productPrice);
         }
 
-        Page<Product> productPage = productService.getCriteriaProductV1(productSearchCriteria);
+        Page<Product> productPage = productService.getCriteriaProductV1(productDynamicQuery);
 
         List<ProductResponseModel> productResponseModelList = productPage.getContent().stream().map(
                 product -> toDto(product)).collect(Collectors.toList());

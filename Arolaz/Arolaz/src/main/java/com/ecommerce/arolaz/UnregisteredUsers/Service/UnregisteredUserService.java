@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface UnregisteredUserService {
     UnregisteredUser addNewUnregisteredUser(UnregisteredUser unregisteredUser);
+    Optional<UnregisteredUser> findByEmailAndPhone(String email, String phone);
 }

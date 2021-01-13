@@ -5,6 +5,8 @@ import com.ecommerce.arolaz.UnregisteredUsers.Repository.UnregisteredUserReposit
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UnregisteredUserServiceImpl implements UnregisteredUserService {
     @Autowired
@@ -12,5 +14,10 @@ public class UnregisteredUserServiceImpl implements UnregisteredUserService {
 
     public UnregisteredUser addNewUnregisteredUser(UnregisteredUser unregisteredUser) {
         return unregisteredUserRepository.save(unregisteredUser);
+    }
+
+    public Optional<UnregisteredUser> findByEmailAndPhone(String email, String phone){
+        Optional<UnregisteredUser> unregisteredUser = unregisteredUserRepository.findByPhoneNumberAndEmail(email,phone);
+        return unregisteredUser;
     }
 }

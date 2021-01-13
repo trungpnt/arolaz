@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.querydsl.core.annotations.QueryEntity;
+import lombok.Builder;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @QueryEntity
 @Document(collection = "security_user")
+@Builder
 public class SecurityUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,6 +51,14 @@ public class SecurityUser {
         this.address = address;
         this.provider = provider;
         this.roles = roles;
+    }
+
+
+    public SecurityUser(String phone, String email, String fullName, String encode) {
+        this.phoneNumber = phone;
+        this.email = email;
+        this.fullName = fullName;
+        this.password = encode;
     }
 
     public AuthProvider getProvider() {

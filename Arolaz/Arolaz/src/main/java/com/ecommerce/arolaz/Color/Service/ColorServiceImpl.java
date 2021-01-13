@@ -3,7 +3,7 @@ package com.ecommerce.arolaz.Color.Service;
 
 import com.ecommerce.arolaz.Color.Model.Color;
 import com.ecommerce.arolaz.Color.Repository.ColorRepository;
-import com.ecommerce.arolaz.utils.ExceptionHandlers.ColorNotFoundException;
+import com.ecommerce.arolaz.Utils.ExceptionHandlers.ColorNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
