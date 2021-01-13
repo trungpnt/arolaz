@@ -29,7 +29,7 @@ public class ProductRepositoryTest {
         final String productName = "Nike Jacket";
         final String categoryName = "Nike";
         final String colorName = "red";
-        final Double price = 220000.0;
+        final Double price = 200000.0;
         final ProductDynamicQuery dynamicQuery = new ProductDynamicQuery();
         dynamicQuery.setProductName(productName);
         dynamicQuery.setCategoryName(categoryName);

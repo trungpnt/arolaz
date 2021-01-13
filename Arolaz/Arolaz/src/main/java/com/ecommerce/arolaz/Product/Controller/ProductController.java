@@ -15,7 +15,6 @@ import com.ecommerce.arolaz.Product.RequestResponseModels.CreateProductRequestMo
 import com.ecommerce.arolaz.Product.RequestResponseModels.ProductResponseModel;
 import com.ecommerce.arolaz.Product.RequestResponseModels.ProductSizePriceQuantityColor;
 import com.ecommerce.arolaz.Product.RequestResponseModels.UpdateProductRequestModel;
-import com.ecommerce.arolaz.Product.RestfulParams.core.FilterCollector;
 import com.ecommerce.arolaz.Product.Service.ProductService;
 import com.ecommerce.arolaz.ProductSize.Model.ProductSize;
 import com.ecommerce.arolaz.ProductSize.Service.ProductSizeService;
@@ -49,8 +48,6 @@ import java.util.stream.Collectors;
 @CrossOrigin
 @RequestMapping("/api")
 public class ProductController {
-    @Autowired
-    private FilterCollector filterCollector;
 
     @Autowired
     private ProductService productService;
@@ -372,7 +369,7 @@ public class ProductController {
 
     @GetMapping(path = "/products/criteria/v1")
     @ResponseStatus(HttpStatus.OK)
-    public CustomizedPagingResponseModel<ProductResponseModel> getProducts(@RequestParam( value = "name",required = false) /*Map<String,String> filters*/ String productName, @RequestParam(value = "color",required = false) String colorName, @RequestParam(value = "brand",required = false) String brandName, @RequestParam(value = "price",required = false) Double productPrice, @RequestParam(value="sortBy") String sortBy, @RequestParam("page") Integer page, @RequestParam("rows") Integer rows, Pageable pageable ){
+    public CustomizedPagingResponseModel<ProductResponseModel> getProducts(@RequestParam( value = "name",required = false) /*Map<String,String> filters*/ String productName, @RequestParam(value = "color",required = false) String colorName, @RequestParam(value = "brand",required = false) String brandName, @RequestParam(value = "price",required = false) Double productPrice, @RequestParam(value="sortBy",required = false) String sortBy, @RequestParam("page") Integer page, @RequestParam("rows") Integer rows, Pageable pageable ){
 
 //        Map<String,String> restApiMongoQueries = filterCollector.collectRestApiParams(filters);
         ProductDynamicQuery productDynamicQuery = new ProductDynamicQuery();
@@ -414,6 +411,5 @@ public class ProductController {
         return new ProductResponseModel(productId,product.getProductName(),product.getCategoryName(),product.getImgUrl(),product.getBrandName(), product.getBasicSmallSizePrice(),product.getDescription(),product.getBasicColorName(),product.getBasicSizeName(), product.getProductSizePriceQuantityColors());
 
     }
-
 
 }

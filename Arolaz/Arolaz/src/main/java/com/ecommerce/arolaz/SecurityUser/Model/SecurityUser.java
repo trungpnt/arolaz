@@ -19,7 +19,6 @@ import java.util.List;
 
 @QueryEntity
 @Document(collection = "security_user")
-@Builder
 public class SecurityUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +42,7 @@ public class SecurityUser {
 
     private List<SecurityRole> roles;
 
-    public SecurityUser(String email, @Size(min = 7) String fullName, String phoneNumber, String password, String address, AuthProvider provider, List<SecurityRole> roles) {
+    public SecurityUser(String email, String fullName, String phoneNumber, String password, String address, AuthProvider provider, List<SecurityRole> roles) {
         this.email = email;
         this.fullName = fullName;
         this.phoneNumber = phoneNumber;
@@ -52,7 +51,6 @@ public class SecurityUser {
         this.provider = provider;
         this.roles = roles;
     }
-
 
     public SecurityUser(String phone, String email, String fullName, String encode) {
         this.phoneNumber = phone;
