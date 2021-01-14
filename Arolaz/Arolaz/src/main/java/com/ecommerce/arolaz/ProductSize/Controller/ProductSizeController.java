@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -22,27 +23,18 @@ public class ProductSizeController {
     @Autowired
     private ProductSizeService service;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/product-size")
-    public ResponseEntity<ProductSizeResponseModel> addNewProductSize(CreateProductSizeRequestModel createProductSizeRequestModel){
-        ProductSize persistProductSize = modelMapper.map(createProductSizeRequestModel,ProductSize.class);
-
-        Optional<ProductSize> foundProductSize = service.findByProductIdAndSizeNameAndPrice(createProductSizeRequestModel.getProductId(), createProductSizeRequestModel.getSizeName(), createProductSizeRequestModel.getPrice());
-
-        service.addNewProductSize(persistProductSize);
-
-        return new ResponseEntity<>(toProductSizeResponseModel(persistProductSize), HttpStatus.CREATED);
+    @GetMapping("/product-size")
+    public ResponseEntity<List<ProductSizeResponseModel>> getAllProductSizes(){
+        List<ProductSize> allProductSizes = service.findAll();
+        return new ResponseEntity<>(buildList(allProductSizes),HttpStatus.OK);
     }
-
-
-    //GetMapping
-
 
     private ProductSizeResponseModel toProductSizeResponseModel(ProductSize productSize){
         return new ProductSizeResponseModel(productSize.getProductId().toString(), productSize.getProductId(), productSize.getSizeName(), productSize.getPrice());
+    }
+
+    private List<ProductSizeResponseModel> buildList(List<ProductSize> productSizes){
+        return productSizes.stream().map(eachProductSize -> toProductSizeResponseModel(eachProductSize)).collect(Collectors.toList());
     }
 
 }

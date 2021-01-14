@@ -1,4 +1,5 @@
 package com.ecommerce.arolaz.Repository;
+
 import com.ecommerce.arolaz.SecurityUser.Model.SecurityUser;
 import com.ecommerce.arolaz.SecurityUser.Repository.SecurityUserRepository;
 import org.junit.Test;

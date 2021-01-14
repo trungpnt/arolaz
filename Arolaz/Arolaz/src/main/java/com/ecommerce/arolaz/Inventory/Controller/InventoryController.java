@@ -52,7 +52,7 @@ public class InventoryController {
         return new InventoryQuantityResponseModel(inventory.getInventoryId().toString(),inventory.getQuantity());
     }
     private InventoryResponseModel toInventoryResponseModel(Inventory inventory){
-        return new InventoryResponseModel(inventory.getInventoryId().toString(), inventory.getProductId(), inventory.getProductSizeId(), inventory.getColorId(), inventory.getQuantity());
+        return new InventoryResponseModel(inventory.getInventoryId().toString(), inventory.getProductId(), inventory.getSizeId(), inventory.getColorId(), inventory.getQuantity());
     }
 
 }

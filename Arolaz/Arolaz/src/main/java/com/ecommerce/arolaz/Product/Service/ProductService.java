@@ -5,7 +5,9 @@ import com.ecommerce.arolaz.Product.Model.ProductDynamicQuery;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductService {
@@ -15,4 +17,5 @@ public interface ProductService {
     Optional<Product> findByProductId(ObjectId productId);
     void deleteProductById(ObjectId productId);
     public Page<Product> getCriteriaProductV1(ProductDynamicQuery productDynamicQuery);
+    List<Product> query(ProductDynamicQuery productDynamicQuery);
 }

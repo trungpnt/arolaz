@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ColorService {
-    Color addNewColor(Color color);
+    Optional<Color> addNewColor(Color color);
     Optional<Color> findByColorName(String colorName);
     List<Color> findAll();
+    boolean existsByColorName (String colorName);
 }

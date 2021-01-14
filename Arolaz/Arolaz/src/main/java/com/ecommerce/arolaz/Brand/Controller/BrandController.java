@@ -40,8 +40,8 @@ public class BrandController {
             result.setResponseCode(HttpStatus.FORBIDDEN.value());
             return new ResponseEntity<ObjectCreationSuccessResponse>(result,HttpStatus.FORBIDDEN);
         }
-        Brand persistBrand = brandService.addNew(brand);
-        result.setId(persistBrand.getBrandId().toString());
+        Optional<Brand> persistBrand = brandService.addNew(brand);
+        result.setId(persistBrand.get().getBrandId().toString());
         result.setResponseCode(HttpStatus.CREATED.value());
         return new ResponseEntity<ObjectCreationSuccessResponse>(result,HttpStatus.CREATED);
     }

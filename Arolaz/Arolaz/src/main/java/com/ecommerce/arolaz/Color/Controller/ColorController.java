@@ -48,6 +48,8 @@ public class ColorController {
     @PostMapping("/color")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ColorResponseModel> addNewColor(CreateColorRequestModel createColorRequestModel){
+        String colorName = createColorRequestModel.getColorName();
+
         Optional<Color> colorOptional = service.findByColorName(createColorRequestModel.getColorName());
         if(colorOptional.isPresent()){
             throw new RuntimeException("Color name already exists !".toUpperCase());

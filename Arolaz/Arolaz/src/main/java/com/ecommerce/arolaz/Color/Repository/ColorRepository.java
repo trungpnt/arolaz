@@ -10,5 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface ColorRepository extends MongoRepository<Color, ObjectId> {
-    Optional<Color> findByColorName(String colorName);
+    Optional<Color> findByColorName (String colorName);
+    boolean existsByColorName (String colorName);
 }

@@ -9,4 +9,6 @@ public interface InventoryService {
     Optional<Inventory> findBySizeAndColor(String proId, String sizeId, String colorId);
     Inventory addNewInventory(Inventory inventory);
     String deleteByProductId(String productId);
+    void deleteInventory(Inventory inventory);
+    Optional<Inventory> findByProductIdAndSizeIdAndColorId(String proId, String sizeId, String colorId);
 }

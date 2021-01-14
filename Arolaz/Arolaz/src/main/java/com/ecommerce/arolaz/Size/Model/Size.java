@@ -18,6 +18,8 @@ public class Size {
 
     private String sizeName;
 
+    public Size(){}
+
     public Size(String sizeName) {
         this.sizeName = sizeName;
     }

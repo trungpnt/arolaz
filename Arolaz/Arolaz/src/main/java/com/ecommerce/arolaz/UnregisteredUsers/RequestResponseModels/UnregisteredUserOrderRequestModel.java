@@ -5,13 +5,13 @@ import com.ecommerce.arolaz.OrderDetails.RequestResponseModels.CreateOrderDetail
 
 public class UnregisteredUserOrderRequestModel {
     private CreateUnregisteredUserModel unregisteredUser;
-    private CreateOrderRequestModel createOrderDetails;
+    private CreateOrderRequestModel createOrderRequestModel;
 
     public UnregisteredUserOrderRequestModel(){}
 
-    public UnregisteredUserOrderRequestModel(CreateUnregisteredUserModel unregisteredUser, CreateOrderRequestModel createOrderDetails) {
+    public UnregisteredUserOrderRequestModel(CreateUnregisteredUserModel unregisteredUser, CreateOrderRequestModel createOrderRequestModel) {
         this.unregisteredUser = unregisteredUser;
-        this.createOrderDetails = createOrderDetails;
+        this.createOrderRequestModel = createOrderRequestModel;
     }
 
     public CreateUnregisteredUserModel getUnregisteredUser() {
@@ -22,11 +22,11 @@ public class UnregisteredUserOrderRequestModel {
         this.unregisteredUser = unregisteredUser;
     }
 
-    public CreateOrderRequestModel getCreateOrderDetails() {
-        return createOrderDetails;
+    public CreateOrderRequestModel getCreateOrderRequestModel() {
+        return createOrderRequestModel;
     }
 
-    public void setCreateOrderDetails(CreateOrderRequestModel createOrderDetails) {
-        this.createOrderDetails = createOrderDetails;
+    public void setCreateOrderRequestModel(CreateOrderRequestModel createOrderRequestModel) {
+        this.createOrderRequestModel = createOrderRequestModel;
     }
 }

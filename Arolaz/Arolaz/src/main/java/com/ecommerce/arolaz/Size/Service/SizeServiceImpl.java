@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,4 +32,23 @@ public class SizeServiceImpl implements SizeService {
         }
         return foundSize;
     }
+
+    @Override
+    public boolean existsBySizeName(String sizeName){
+        return sizeRepository.existsBySizeName(sizeName);
+    }
+
+    @Override
+    public Optional<Size> addNewSize(Size size){
+        if(!existsBySizeName(size.getSizeName())){
+            return Optional.of(sizeRepository.save(size));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Size> findAll(){
+        return sizeRepository.findAll();
+    }
+
 }

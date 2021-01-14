@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository
 public interface BrandRepository extends MongoRepository<Brand, ObjectId> {
     Optional<Brand> findByBrandName(String brandName);
+    boolean existsByBrandName(String brandName);
+
 }

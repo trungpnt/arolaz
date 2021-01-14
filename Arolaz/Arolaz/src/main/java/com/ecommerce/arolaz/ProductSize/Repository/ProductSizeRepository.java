@@ -14,4 +14,5 @@ public interface ProductSizeRepository extends PagingAndSortingRepository<Produc
     List<ProductSize> findByProductId(String productId);
     Optional<ProductSize> findByProductIdAndSizeName(String productId, String sizeName);
     void deleteByProductId(String productId);
+    List<ProductSize> findAll();
 }

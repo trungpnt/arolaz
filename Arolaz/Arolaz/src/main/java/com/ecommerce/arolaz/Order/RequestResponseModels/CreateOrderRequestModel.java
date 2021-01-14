@@ -7,6 +7,7 @@ import java.util.List;
  * CreateOrderRequestModel
  */
 public class CreateOrderRequestModel {
+
   private String address,note;
 
   private List<CreateOrderDetailsRequestModel> createOrderDetails;

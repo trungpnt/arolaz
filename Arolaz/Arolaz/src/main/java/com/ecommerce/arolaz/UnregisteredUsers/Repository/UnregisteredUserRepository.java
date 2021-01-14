@@ -10,4 +10,10 @@ import java.util.Optional;
 @Repository
 public interface UnregisteredUserRepository extends PagingAndSortingRepository<UnregisteredUser, ObjectId> {
     Optional<UnregisteredUser> findByPhoneNumberAndEmail(String phone, String email);
+    boolean existsByEmail(String email);
+    boolean existsByPhoneNumber(String phone);
+
+    @Override
+    long count();
+
 }

@@ -56,4 +56,9 @@ public class ProductSizeServiceImpl implements ProductSizeService{
         return "Deleted";
     }
 
+    @Override
+    public List<ProductSize> findAll(){
+        return productSizeRepository.findAll();
+    }
+
 }

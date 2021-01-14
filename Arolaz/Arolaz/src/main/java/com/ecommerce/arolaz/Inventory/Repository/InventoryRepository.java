@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface InventoryRepository extends PagingAndSortingRepository<Inventory, ObjectId> {
-    Optional<Inventory> findByProductIdAndProductSizeIdAndColorId(String proId, String sizeId, String colorId);
+    Optional<Inventory> findByProductIdAndSizeIdAndColorId(String proId, String sizeId, String colorId);
     List<Inventory> findByProductId(String productId);
     void deleteByProductId(String productId);
 }

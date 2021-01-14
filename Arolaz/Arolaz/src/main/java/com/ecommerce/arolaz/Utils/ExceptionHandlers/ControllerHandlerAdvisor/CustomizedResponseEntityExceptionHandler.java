@@ -29,6 +29,19 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     }
 
 
+    @ExceptionHandler(BrandNameAlreadyExistsException.class)
+    public final ResponseEntity<Object> handleBrandNameAlreadyExistsExceptions(BrandNameAlreadyExistsException ex, WebRequest request){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(),ex.getMessage(),request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ColorNameAlreadyExistsException.class)
+    public final ResponseEntity<Object> handleColorNameAlreadyExistsExceptions(ColorNameAlreadyExistsException ex, WebRequest request){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(),ex.getMessage(),request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
     @ExceptionHandler(UserRoleNotFoundException.class)
     public final ResponseEntity<Object> handleUserRoleNotFoundExceptions(UserRoleNotFoundException ex, WebRequest request){
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(),ex.getMessage(),request.getDescription(false));

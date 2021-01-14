@@ -232,14 +232,8 @@ public class ProductController {
          * */
         Optional<Product> toUpdateProduct = productService.findByProductId(new ObjectId(productId));
 
-        /**
-         * Delete records in Inventory and ProductSize with corresponding productId
-         * */
-        productSizeService.deleteByProductId(productId);
-        inventoryService.deleteByProductId(productId);
-
         ProductImgUrlResponseModel productImgUrlResponseModel = new ProductImgUrlResponseModel();
-        if(!multipartFile.isEmpty()){
+        if(multipartFile != null){
             /**
              * Upload image file to S3 bucket and combine ImgUrl for product
              * @param multipartFile
@@ -250,6 +244,13 @@ public class ProductController {
             productImgUrlResponseModel.setFileName(imgUrl);
         }
         toUpdateProduct.get().setImgUrl(productImgUrlResponseModel.getImgUrl());
+
+        /**
+         * Delete records in Inventory and ProductSize with corresponding productId
+         * */
+        productSizeService.deleteByProductId(productId);
+        inventoryService.deleteByProductId(productId);
+
         if(name != null){
             toUpdateProduct.get().setProductName(name);
         }
@@ -287,7 +288,8 @@ public class ProductController {
          * */
         List<ProductSizePriceQuantityColor> productSizePriceQuantityColors = extractDataAndBuildList(updateProductRequestModel);
         toUpdateProduct.get().setProductSizePriceQuantityColors(productSizePriceQuantityColors);
-
+        toUpdateProduct.get().setBasicColorName(productColorNames.get(0));
+        toUpdateProduct.get().setBasicSmallSizePrice(productSizePrices.get(0));
         Product afterSaved = productService.addProduct(toUpdateProduct.get());
 
         String newProductId = afterSaved.getProductId().toString();
@@ -329,7 +331,7 @@ public class ProductController {
     @DeleteMapping("/products/{productId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void deleteProductById(@PathVariable(value = "productId") String productId, HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal){
+    public ResponseEntity<String> deleteProductById(@PathVariable(value = "productId") String productId, HttpServletRequest request, @RequestHeader(value = "Authorization") String headerVal){
         String token = headerVal.substring(headerVal.indexOf(" "));
         tokenValidator.validateTokenAdminAuthorization(token);
 
@@ -337,7 +339,9 @@ public class ProductController {
 
         productSizeService.deleteByProductId(productId);
         inventoryService.deleteByProductId(productId);
-        productService.deleteProductById(product.get().getProductId());
+        productService.deleteProductById(new ObjectId(productId));
+
+        return new ResponseEntity<>("PRODUCT DELETED",HttpStatus.OK);
     }
 
     /**
@@ -345,7 +349,7 @@ public class ProductController {
      * */
     @GetMapping(path = "/products")
     @ResponseStatus(HttpStatus.OK)
-    public CustomizedPagingResponseModel<ProductResponseModel> getProducts(
+    public CustomizedPagingResponseModel<ProductResponseModel> getAllProducts(
             @RequestParam("page") Integer page,
             @RequestParam("rows") Integer rows,
             @RequestParam(value = "categoryId",required = false) String categoryId, Pageable pageable) {
@@ -369,9 +373,8 @@ public class ProductController {
 
     @GetMapping(path = "/products/criteria/v1")
     @ResponseStatus(HttpStatus.OK)
-    public CustomizedPagingResponseModel<ProductResponseModel> getProducts(@RequestParam( value = "name",required = false) /*Map<String,String> filters*/ String productName, @RequestParam(value = "color",required = false) String colorName, @RequestParam(value = "brand",required = false) String brandName, @RequestParam(value = "price",required = false) Double productPrice, @RequestParam(value="sortBy",required = false) String sortBy, @RequestParam("page") Integer page, @RequestParam("rows") Integer rows, Pageable pageable ){
+    public CustomizedPagingResponseModel<ProductResponseModel> getProducts(@RequestParam(value = "name",required = false) /*Map<String,String> filters*/ String productName, @RequestParam(value = "color",required = false) String colorName, @RequestParam(value = "brand",required = false) String brandName, @RequestParam(value = "price",required = false) Double productPrice, @RequestParam(value="sortBy",required = false) String sortBy, @RequestParam("page") Integer page, @RequestParam("rows") Integer rows, Pageable pageable ){
 
-//        Map<String,String> restApiMongoQueries = filterCollector.collectRestApiParams(filters);
         ProductDynamicQuery productDynamicQuery = new ProductDynamicQuery();
 
         if(sortBy != null){

@@ -13,11 +13,32 @@ public class UnregisteredUserServiceImpl implements UnregisteredUserService {
     private UnregisteredUserRepository unregisteredUserRepository;
 
     public UnregisteredUser addNewUnregisteredUser(UnregisteredUser unregisteredUser) {
-        return unregisteredUserRepository.save(unregisteredUser);
+
+        Optional<UnregisteredUser> tryFind = null;
+
+        if(unregisteredUserRepository.count() == 0){
+            return unregisteredUserRepository.save(unregisteredUser);
+        }
+
+        if(existsByEmail(unregisteredUser.getEmail()) && existsByPhone(unregisteredUser.getPhoneNumber())){
+            tryFind = unregisteredUserRepository.findByPhoneNumberAndEmail(unregisteredUser.getPhoneNumber(), unregisteredUser.getEmail());
+        }
+        return unregisteredUserRepository.save(tryFind.get());
     }
 
+    @Override
     public Optional<UnregisteredUser> findByEmailAndPhone(String email, String phone){
         Optional<UnregisteredUser> unregisteredUser = unregisteredUserRepository.findByPhoneNumberAndEmail(email,phone);
         return unregisteredUser;
+    }
+
+    @Override
+    public boolean existsByEmail(String email){
+        return unregisteredUserRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsByPhone(String phone){
+        return unregisteredUserRepository.existsByPhoneNumber(phone);
     }
 }

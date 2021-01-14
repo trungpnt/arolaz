@@ -13,4 +13,5 @@ public interface ProductSizeService {
     Optional<ProductSize> findByProductIdAndSizeName(String proId,String sizeName);
     List<ProductSize> findByProductId(String proId);
     String deleteByProductId(String proId);
+    List<ProductSize> findAll();
 }

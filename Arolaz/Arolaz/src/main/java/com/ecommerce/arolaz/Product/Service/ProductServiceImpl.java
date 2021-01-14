@@ -3,15 +3,20 @@ package com.ecommerce.arolaz.Product.Service;
 import com.ecommerce.arolaz.Product.Model.Product;
 import com.ecommerce.arolaz.Product.Model.ProductDynamicQuery;
 import com.ecommerce.arolaz.Product.Repository.ProductRepository;
-import com.ecommerce.arolaz.Product.Repository.ProductRepositoryCustom;
 import com.ecommerce.arolaz.Utils.ExceptionHandlers.ProductNotFoundException;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,11 +25,11 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
 
     @Autowired
-    private ProductRepositoryCustom productRepositoryCustom;
+    private MongoTemplate mongoTemplate;
 
     @Override
     public Page<Product> getCriteriaProductV1( ProductDynamicQuery productDynamicQuery){
-        return new PageImpl<>(productRepositoryCustom.query(productDynamicQuery));
+        return new PageImpl<>(query(productDynamicQuery));
     }
 
     @Override
@@ -60,4 +65,41 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
+    public List<Product> query(ProductDynamicQuery productDynamicQuery) {
+        final Query query = new Query();
+        final List<Criteria> criteria = new ArrayList<>();
+
+        if(productDynamicQuery.getSizeName() != null){
+            criteria.add(Criteria.where("basicSizeName").is(productDynamicQuery.getSizeName()));
+        }
+
+        if(productDynamicQuery.getProductName() != null){
+            criteria.add(Criteria.where("productName").is(productDynamicQuery.getProductName()));
+        }
+
+        if(productDynamicQuery.getBrandName() != null){
+            criteria.add(Criteria.where("brandName").is(productDynamicQuery.getBrandName()));
+        }
+
+        if(productDynamicQuery.getColorName() != null){
+            criteria.add(Criteria.where("basicColorName").is(productDynamicQuery.getColorName()));
+        }
+
+        if(productDynamicQuery.getPrice() != null){
+            criteria.add(Criteria.where("basicSmallSizePrice").is(productDynamicQuery.getPrice()));
+        }
+
+        if(!criteria.isEmpty()) {
+            if(productDynamicQuery.getSortBy() != null){
+                query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[criteria.size()])));
+                query.with(Sort.by(Sort.Direction.DESC, productDynamicQuery.getSortBy()));
+            }
+            else{
+                query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[criteria.size()])));
+            }
+        }
+
+        return mongoTemplate.find(query, Product.class);
+    }
 }

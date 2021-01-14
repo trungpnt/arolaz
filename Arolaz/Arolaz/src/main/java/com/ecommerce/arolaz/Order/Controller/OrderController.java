@@ -1,5 +1,6 @@
 package com.ecommerce.arolaz.Order.Controller;
 
+import com.ecommerce.arolaz.Inventory.Service.InventoryService;
 import com.ecommerce.arolaz.Utils.ExceptionHandlers.InsufficientInventoryQuantityException;
 import com.ecommerce.arolaz.Utils.ExceptionHandlers.TokenUserIdNotFoundException;
 import com.ecommerce.arolaz.Utils.ExceptionHandlers.UserNotFoundException;
@@ -83,7 +84,7 @@ public class OrderController {
     private TokenValidator tokenValidator;
 
     @Autowired
-    private InventoryRepository inventoryRepository;
+    private InventoryService inventoryService;
 
     private OrderDetails toOrderDetailsDomain (String orderId){
         OrderDetails orderDetails = new OrderDetails();
@@ -102,7 +103,7 @@ public class OrderController {
          * Extracting 2 corresponding objects
          * */
         CreateUnregisteredUserModel createUnregisteredUserModel = unregisteredUserOrderRequestModel.getUnregisteredUser();
-        CreateOrderRequestModel createOrderRequestModel = unregisteredUserOrderRequestModel.getCreateOrderDetails();
+        CreateOrderRequestModel createOrderRequestModel = unregisteredUserOrderRequestModel.getCreateOrderRequestModel();
 
         /**
          * Persist Unregistered User
@@ -170,28 +171,24 @@ public class OrderController {
              * @param productId,sizeId,colorId
              * @return quantity
              * */
-            Optional<Inventory> inventoryFound =  inventoryRepository.findByProductIdAndProductSizeIdAndColorId(productId,sizeId,colorId);
+            Optional<Inventory> inventoryFound =  inventoryService.findByProductIdAndSizeIdAndColorId(productId,sizeId,colorId);
             int inventoryQuantity = inventoryFound.get().getQuantity();
 
             /**
              * Ensure sufficient quantity
              * */
-            //Should be delegated to a function
             if( quantity > inventoryQuantity ){
-                throw new InsufficientInventoryQuantityException("The product quantity exceeds inventory's");
+                throw new InsufficientInventoryQuantityException(String.format("The product with %s, %s, %s quantity exceeds inventory's one",productId, sizeId, colorId));
             }
 
             int newInventoryQuantity = inventoryQuantity - quantity;
 
             /**
-             * Delete old inventory
+             *
              * Update new Inventory's quantity
-             * @param productId,sizeId,colorId,newInventoryQuantity
-             * @return updatedInventory
              * */
-            inventoryRepository.delete(inventoryFound.get());
-            Inventory newInventory = new Inventory(productId,sizeId,colorId,newInventoryQuantity);
-            inventoryRepository.save(newInventory);
+            inventoryFound.get().setQuantity(newInventoryQuantity);
+            inventoryService.addNewInventory(inventoryFound.get());
 
             /**
              * Creating and persisting order details model
@@ -262,7 +259,9 @@ public class OrderController {
         int totalQuantity = 0;
 
         List<CreateOrderDetailsRequestModel> orderDetailsList = createOrderRequestModel.getCreateOrderDetails();
+
         for(int i  = 0, n = orderDetailsList.size(); i < n; i++){
+
             OrderDetails orderDetails = new OrderDetails();
 
             /***
@@ -276,8 +275,7 @@ public class OrderController {
             /**
              * Retrieving sizeName for this sizeId
              * */
-            ObjectId sizeObjectId = new ObjectId(sizeId);
-            Optional<Size> sizeFound = sizeService.findBySizeId(sizeObjectId);
+            Optional<Size> sizeFound = sizeService.findBySizeId(new ObjectId(sizeId));
             String sizeName = sizeFound.get().getSizeName();
 
             /**
@@ -295,7 +293,7 @@ public class OrderController {
              * Checking each product's quantity against one in Inventory
              * Updating remaining quantity
              * */
-            Optional<Inventory> inventoryFound =  inventoryRepository.findByProductIdAndProductSizeIdAndColorId(productId,sizeId,colorId);
+            Optional<Inventory> inventoryFound =  inventoryService.findByProductIdAndSizeIdAndColorId(productId,sizeId,colorId);
             int inventoryQuantity = inventoryFound.get().getQuantity();
 
             if( quantity > inventoryQuantity ){
@@ -307,9 +305,8 @@ public class OrderController {
             /**
              * Update new Inventory's quantity
              * */
-            inventoryRepository.delete(inventoryFound.get());
-            Inventory newInventory = new Inventory(productId,sizeId,colorId,newInventoryQuantity);
-            inventoryRepository.save(newInventory);
+            inventoryFound.get().setQuantity(newInventoryQuantity);
+            inventoryService.addNewInventory(inventoryFound.get());
 
             /**
              * Creating and persisting order details model
@@ -341,7 +338,7 @@ public class OrderController {
     @GetMapping(path = "/order/{orderId}")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<OrderResponseModel> getSingleOrder(@PathVariable(value = "orderId") ObjectId orderId) {
-        LOGGER.info("this api is being called");
+
         Optional<Order> order = orderService.findByOrderId(orderId);
         return new ResponseEntity<OrderResponseModel>(toDto(order),HttpStatus.OK);
     }

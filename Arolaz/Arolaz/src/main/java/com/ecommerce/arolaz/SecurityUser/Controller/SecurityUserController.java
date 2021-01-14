@@ -83,22 +83,22 @@ public class SecurityUserController {
         return new ResponseEntity<>(userTokenResponseModel,HttpStatus.CREATED);
     }
 
-    @GetMapping("/users")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public CustomizedPagingResponseModel<SecurityUserResponseModel> getAllUsers(@RequestParam("page") Integer page,
-                                                                                @RequestParam("rows") Integer rows, Pageable pageable) {
-
-        Page<SecurityUser> securityUserPage = securityUserService.findAll(pageable);
-        CustomizedPagingResponseModel<SecurityUserResponseModel> securityUserResponseModelCustomizedPagingResponseModel =
-                new CustomizedPagingResponseModel<>();
-
-        List<SecurityUserResponseModel> securityUserList = securityUserPage.getContent().stream().map(
-                securityUser -> toDto(securityUser)).collect(Collectors.toList());
-        securityUserResponseModelCustomizedPagingResponseModel.setPagingData(securityUserList);
-        securityUserResponseModelCustomizedPagingResponseModel.setTotalPage(securityUserPage.getTotalPages());
-
-        return securityUserResponseModelCustomizedPagingResponseModel;
-    }
+//    @GetMapping("/users")
+//    @PreAuthorize("hasAuthority('ADMIN')")
+//    public CustomizedPagingResponseModel<SecurityUserResponseModel> getAllUsers(@RequestParam("page") Integer page,
+//                                                                                @RequestParam("rows") Integer rows, Pageable pageable) {
+//
+//        Page<SecurityUser> securityUserPage = securityUserService.findAll(pageable);
+//        CustomizedPagingResponseModel<SecurityUserResponseModel> securityUserResponseModelCustomizedPagingResponseModel =
+//                new CustomizedPagingResponseModel<>();
+//
+//        List<SecurityUserResponseModel> securityUserList = securityUserPage.getContent().stream().map(
+//                securityUser -> toDto(securityUser)).collect(Collectors.toList());
+//        securityUserResponseModelCustomizedPagingResponseModel.setPagingData(securityUserList);
+//        securityUserResponseModelCustomizedPagingResponseModel.setTotalPage(securityUserPage.getTotalPages());
+//
+//        return securityUserResponseModelCustomizedPagingResponseModel;
+//    }
 
     private SecurityUserResponseModel toDto(SecurityUser securityUser) {
         return new SecurityUserResponseModel(securityUser.getId().toString(), securityUser.getFullName(),securityUser.getEmail(), securityUser.getPhoneNumber(), securityUser.getAddress(), securityUser.getRoles().get(0).getRoleId().toString());

@@ -1,18 +1,19 @@
 package com.ecommerce.arolaz.Product.Repository;
 
 import com.ecommerce.arolaz.Product.Model.Product;
+import com.ecommerce.arolaz.Product.Model.ProductDynamicQuery;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProductRepository extends PagingAndSortingRepository<Product, ObjectId>{
+public interface ProductRepository extends PagingAndSortingRepository<Product, ObjectId> {
+
     Page<Product> findByCategoryId(String categoryId, Pageable pageable);
     Optional<Product> findByProductId(ObjectId productId);
     Page<Product> findAll(Pageable pageable);

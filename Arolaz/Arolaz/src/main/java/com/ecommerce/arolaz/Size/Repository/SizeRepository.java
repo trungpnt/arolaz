@@ -10,5 +10,6 @@ import java.util.Optional;
 @Repository
 public interface SizeRepository extends MongoRepository<Size, ObjectId> {
     Optional<Size> findBySizeName (String sizeName);
-    Size findBySizeId(ObjectId sizeId);
+    Optional<Size> findBySizeId(ObjectId sizeId);
+    boolean existsBySizeName(String sizeName);
 }

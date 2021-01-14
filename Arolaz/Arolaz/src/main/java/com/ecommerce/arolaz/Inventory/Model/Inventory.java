@@ -17,7 +17,7 @@ public class Inventory {
 
     private String productId;
 
-    private String productSizeId;
+    private String sizeId;
 
     private String colorId;
 
@@ -27,9 +27,9 @@ public class Inventory {
         return inventoryId;
     }
 
-    public Inventory(String productId, String productSizeId, String colorId, int quantity) {
+    public Inventory(String productId, String sizeId, String colorId, int quantity) {
         this.productId = productId;
-        this.productSizeId = productSizeId;
+        this.sizeId = sizeId;
         this.colorId = colorId;
         this.quantity = quantity;
     }
@@ -42,12 +42,12 @@ public class Inventory {
         this.productId = productId;
     }
 
-    public String getProductSizeId() {
-        return productSizeId;
+    public String getSizeId() {
+        return sizeId;
     }
 
-    public void setProductSizeId(String productSizeId) {
-        this.productSizeId = productSizeId;
+    public void setSizeId(String sizeId) {
+        this.sizeId = sizeId;
     }
 
     public String getColorId() {

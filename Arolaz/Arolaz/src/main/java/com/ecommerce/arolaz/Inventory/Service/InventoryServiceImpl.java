@@ -16,7 +16,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public Optional<Inventory> findBySizeAndColor(String proId, String sizeId, String colorId) {
-        Optional<Inventory> inventory = inventoryRepository.findByProductIdAndProductSizeIdAndColorId(proId,sizeId,colorId);
+        Optional<Inventory> inventory = inventoryRepository.findByProductIdAndSizeIdAndColorId(proId,sizeId,colorId);
         if(!inventory.isPresent()){
             throw new InventoryNotFoundException(String.format("Inventory with '%s' and '%s' and '%s' not found !", proId,sizeId,colorId));
         }
@@ -36,5 +36,15 @@ public class InventoryServiceImpl implements InventoryService {
         }
         inventoryRepository.deleteByProductId(productId);
         return "DELETED";
+    }
+
+    @Override
+    public void deleteInventory(Inventory inventory) {
+        inventoryRepository.delete(inventory);
+    }
+
+    @Override
+    public Optional<Inventory> findByProductIdAndSizeIdAndColorId(String proId, String sizeId, String colorId) {
+        return inventoryRepository.findByProductIdAndSizeIdAndColorId(proId, sizeId, colorId);
     }
 }

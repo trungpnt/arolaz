@@ -25,6 +25,8 @@ public class ProductSize {
 
     private String productId;
 
+    public ProductSize(){}
+
     public ProductSize(Double price, String sizeName, String productId) {
         this.price = price;
         this.sizeName = sizeName;
