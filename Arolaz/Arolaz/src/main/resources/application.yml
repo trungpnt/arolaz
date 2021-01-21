@@ -13,7 +13,7 @@ aws:
 security:
   jwt:
     token:
-      secret-key: mphzU1ThaYwlV4p65+2YGZegzqBvvKYaIjhvzW4Qhuo=
+      secret-key: 
       expiration: 60000000
 
 spring:
