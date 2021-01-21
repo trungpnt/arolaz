@@ -5,7 +5,7 @@ springdoc:
 
 aws:
   access_key_id: AKIA6GWZQEV6FWGMZJGF
-  secret_access_key: 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
+  secret_access_key:
   s3:
     bucket: arolaz
     region: ap-southeast-1
@@ -28,7 +28,7 @@ spring:
         registration:
           facebook:
             client-id: 730125817708953
-            client-secret: 55d013ae0e5b0ee6271fa17160c3750b
+            client-secret:
             accessTokenUri: https://graph.facebook.com/oauth/access_token
             userAuthorizationUri: https://www.facebook.com/dialog/oauth
             tokenName: oauth_token
