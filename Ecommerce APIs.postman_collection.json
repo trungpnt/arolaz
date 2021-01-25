@@ -1,0 +1,1245 @@
+{
+	"info": {
+		"_postman_id": "31b1b785-7187-4fa3-a6bc-0a71d8ed1d1f",
+		"name": "Ecommerce APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "User Registers  a new account",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"userSpring@gmail.com\",\r\n  \"fullName\" : \"nguyen van a\",\r\n  \"phone\": \"090312032\",\r\n  \"password\": \"User@123\",\r\n  \"address\": \"211 Thach Lam, Phu Thanh , Tan Phu\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/user/signup",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Signs into their account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBZG1pbl80MTMxMiIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJBRE1JTiJ9XSwicGhvbmUiOiI2MTYyNjYiLCJuYW1lIjoiQWRtaW5fNDEzMTIiLCJlbWFpbCI6ImJ3ZWF3QGdtYWlsLmNvbSIsImlkIjoiNWY3NWUyMzRjOGQ3NGMxMzA3NzgwNjNjIn0.ZqAQOe_tVGIXYkHDlbRbI6g75kBYZ7hvlNyH2wYnOuk",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"requiredEntry\": \"090312032\",\r\n  \"password\": \"User@123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/user/signin",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Edits their info",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuZ3V5ZW4gdmFuIGEiLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiVVNFUiJ9XSwicGhvbmVOdW1iZXIiOiIwOTAzMTIwMzIiLCJmdWxsTmFtZSI6Im5ndXllbiB2YW4gYSIsImVtYWlsIjoidXNlclNwcmluZ0BnbWFpbC5jb20iLCJpZCI6IjVmZmYzN2E4NGM2YjgwNWNjNzFiZGU4NiJ9.1mm9zwhoR38716nJvHrQalc2-23xkY-gE_QGq_5imoI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"user111@gmail.com\",\r\n  \"fullName\": \"User\",\r\n  \"phone\": \"0123456789\",\r\n  \"address\": \"211 Thach Lam, Phu Thanh , Tan Phu\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/user/edit",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"edit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Edits their password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuZ3V5ZW4gdmFuIGEiLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiVVNFUiJ9XSwicGhvbmVOdW1iZXIiOiIwMTIzNDU2Nzg5IiwiZnVsbE5hbWUiOiJuZ3V5ZW4gdmFuIGEiLCJlbWFpbCI6InVzZXIxMTFAZ21haWwuY29tIiwiaWQiOiI1ZmZmMzgzZDRjNmI4MDVjYzcxYmRlODcifQ.xaos62bfXAb84nwQ5qt_dBIzeDcmvg4hb8ELGydxbKg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"currentPassword\": \"User@123\",\r\n  \"newPassword\": \"User@1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/user/edit/password",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"edit",
+								"password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Views their info",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuZ3V5ZW4gdmFuIGEiLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiVVNFUiJ9XSwicGhvbmVOdW1iZXIiOiIwOTAzMTIwMzIiLCJmdWxsTmFtZSI6Im5ndXllbiB2YW4gYSIsImVtYWlsIjoidXNlclNwcmluZ0BnbWFpbC5jb20iLCJpZCI6IjVmZmYzN2E4NGM2YjgwNWNjNzFiZGU4NiJ9.1mm9zwhoR38716nJvHrQalc2-23xkY-gE_QGq_5imoI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/user/self",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"self"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Role",
+			"item": [
+				{
+					"name": "Create a new role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOTA5MDkwOTA5MCIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJBRE1JTiJ9XSwicGhvbmUiOiIwOTA5MDkwOTA5MCIsImVtYWlsIjoidGVzdGZAZ21haWwuY29tIiwiaWQiOiI1Zjc1NzFlMTU5NjZmNjUyZjA0ZmQ5MjAifQ.vXF21zAdNBNZOXzubgNnOnC0jcaKhH7X1ZLLQ6_v3zo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"roleName\": \"SUPERMAN\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8100/api/role",
+							"host": [
+								"localhost"
+							],
+							"port": "8100",
+							"path": [
+								"api",
+								"role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch a page of Roles ( WITHOUT ADMIN TOKEN JUST YET ! )",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOTA5MDkwOTA5MCIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJBRE1JTiJ9XSwicGhvbmUiOiIwOTA5MDkwOTA5MCIsImVtYWlsIjoidGVzdGZAZ21haWwuY29tIiwiaWQiOiI1Zjc1NzFlMTU5NjZmNjUyZjA0ZmQ5MjAifQ.vXF21zAdNBNZOXzubgNnOnC0jcaKhH7X1ZLLQ6_v3zo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBZG1pbiIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJBRE1JTiJ9XSwicGhvbmUiOiIxMzEyMzEyNDEyIiwibmFtZSI6IkFkbWluIiwiZW1haWwiOiJOZWVkbGVzdGlja0BnbWFpbC5jb20iLCJpZCI6IjVmNzhjYWYyYjc2MTY3MDk1ZTZlYmYxMSJ9.ZxHjCmriQa-FCSoLuFoVgyfHSHKXJuAYFVYkbIrWGTQ",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/role",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"role"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "Fetch a page of Products by CategoryId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/products?page=0&rows=1&categoryId=5ff5b8708fcbcf16bae675b7",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "rows",
+									"value": "1"
+								},
+								{
+									"key": "categoryId",
+									"value": "5ff5b8708fcbcf16bae675b7"
+								}
+							]
+						},
+						"description": "GET ALL PRODUCT SIZES"
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch a page of Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/products?page=0&rows=1 ",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "rows",
+									"value": "1 "
+								}
+							]
+						},
+						"description": "GET ALL PRODUCT SIZES"
+					},
+					"response": []
+				},
+				{
+					"name": "admin deletes the product by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBZG1pbiIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJBRE1JTiJ9XSwicGhvbmUiOiIxMzEyMzEyNDEyIiwibmFtZSI6IkFkbWluIiwiZW1haWwiOiJOZWVkbGVzdGlja0BnbWFpbC5jb20iLCJpZCI6IjVmNzhjYWYyYjc2MTY3MDk1ZTZlYmYxMSJ9.ZxHjCmriQa-FCSoLuFoVgyfHSHKXJuAYFVYkbIrWGTQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/products/5fff2d7ce55e9358dd0c1900",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"products",
+								"5fff2d7ce55e9358dd0c1900"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "admin adds a new product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRE1JTiBuZ3V5ZW4gdmFuIGIiLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQURNSU4ifV0sInBob25lTnVtYmVyIjoiMDkwMzEyMDMyMzMiLCJmdWxsTmFtZSI6IkFETUlOIG5ndXllbiB2YW4gYiIsImVtYWlsIjoiYWRtaW5TcHJpbmcyQGdtYWlsLmNvbSIsImlkIjoiNWZmZmZjMDQyMzBlZjY3MTEwZmM5MjA4In0.66imJM4CeT3FOGGPeZf06YB1RFtZPAfYqz8H4p-dYrk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/Rayst/Desktop/Young_cats.jpg"
+								},
+								{
+									"key": "categoryName",
+									"value": "Hoodie",
+									"type": "text"
+								},
+								{
+									"key": "brandName",
+									"value": "Adidas",
+									"type": "text"
+								},
+								{
+									"key": "productSizeNames",
+									"value": "S",
+									"type": "text"
+								},
+								{
+									"key": "productSizeNames",
+									"value": "M",
+									"type": "text"
+								},
+								{
+									"key": "productSizeNames",
+									"value": "L",
+									"type": "text"
+								},
+								{
+									"key": "productSizePrices",
+									"value": "100000",
+									"type": "text"
+								},
+								{
+									"key": "productSizePrices",
+									"value": "250000",
+									"type": "text"
+								},
+								{
+									"key": "productSizePrices",
+									"value": "450000",
+									"type": "text"
+								},
+								{
+									"key": "name",
+									"value": " Adidas Hoodie",
+									"type": "text"
+								},
+								{
+									"key": "availableProductColorNames",
+									"value": "red",
+									"type": "text"
+								},
+								{
+									"key": "availableProductColorNames",
+									"value": "blue",
+									"type": "text"
+								},
+								{
+									"key": "availableProductColorNames",
+									"value": "green",
+									"type": "text"
+								},
+								{
+									"key": "productQuantities",
+									"value": "15",
+									"type": "text"
+								},
+								{
+									"key": "productQuantities",
+									"value": "25",
+									"type": "text"
+								},
+								{
+									"key": "productQuantities",
+									"value": "34",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "This Jacket is for sports",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "admin updates existing product with productId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOTA5MDkwOTA5MCIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJBRE1JTiJ9XSwicGhvbmUiOiIwOTA5MDkwOTA5MCIsImVtYWlsIjoidGVzdGZAZ21haWwuY29tIiwiaWQiOiI1Zjc1NzFlMTU5NjZmNjUyZjA0ZmQ5MjAifQ.vXF21zAdNBNZOXzubgNnOnC0jcaKhH7X1ZLLQ6_v3zo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/Rayst/Downloads/So_happy_smiling_cat.jpg"
+								},
+								{
+									"key": "categoryName",
+									"value": "Trousers",
+									"type": "text"
+								},
+								{
+									"key": "brandName",
+									"value": "Dior",
+									"type": "text"
+								},
+								{
+									"key": "productSizeNames",
+									"value": "S",
+									"type": "text"
+								},
+								{
+									"key": "productSizeNames",
+									"value": "M",
+									"type": "text"
+								},
+								{
+									"key": "productSizeNames",
+									"value": "L",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "productSizePrices",
+									"value": "200000",
+									"type": "text"
+								},
+								{
+									"key": "productSizePrices",
+									"value": "550000",
+									"type": "text"
+								},
+								{
+									"key": "productSizePrices",
+									"value": "750000",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "name",
+									"value": "Dior Trousers",
+									"type": "text"
+								},
+								{
+									"key": "availableProductColorNames",
+									"value": "red",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "availableProductColorNames",
+									"value": "blue",
+									"type": "text"
+								},
+								{
+									"key": "availableProductColorNames",
+									"value": "green",
+									"type": "text"
+								},
+								{
+									"key": "productQuantities",
+									"value": "22",
+									"type": "text"
+								},
+								{
+									"key": "productQuantities",
+									"value": "45",
+									"type": "text"
+								},
+								{
+									"key": "productQuantities",
+									"value": "34",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "description",
+									"value": "comfortable trousers",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/products/6000015e943d140d52209897",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"products",
+								"6000015e943d140d52209897"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter,sort,search product with sortBy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/products/criteria/v1?brand=Dior&color=red&price=100000&sortBy=price&page=0&rows=0",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"products",
+								"criteria",
+								"v1"
+							],
+							"query": [
+								{
+									"key": "brand",
+									"value": "Dior"
+								},
+								{
+									"key": "color",
+									"value": "red"
+								},
+								{
+									"key": "price",
+									"value": "100000"
+								},
+								{
+									"key": "sortBy",
+									"value": "price"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "rows",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter,sort,search product",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/products/criteria/v1?brand=Dior&color=red&price=100000&page=0&rows=0",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"products",
+								"criteria",
+								"v1"
+							],
+							"query": [
+								{
+									"key": "brand",
+									"value": "Dior"
+								},
+								{
+									"key": "color",
+									"value": "red"
+								},
+								{
+									"key": "price",
+									"value": "100000"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "rows",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Category",
+			"item": [
+				{
+					"name": "Get a list of Categories",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwOTA5MDkwOTA5MCIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJBRE1JTiJ9XSwicGhvbmUiOiIwOTA5MDkwOTA5MCIsImVtYWlsIjoidGVzdGZAZ21haWwuY29tIiwiaWQiOiI1Zjc1NzFlMTU5NjZmNjUyZjA0ZmQ5MjAifQ.vXF21zAdNBNZOXzubgNnOnC0jcaKhH7X1ZLLQ6_v3zo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/categories",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"categories"
+							]
+						},
+						"description": "GET ALL Categories"
+					},
+					"response": []
+				},
+				{
+					"name": "create new Category (ADMIN TOKEN)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBZG1pbiIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJBRE1JTiJ9XSwicGhvbmUiOiIxMzEyMzEyNDEyIiwibmFtZSI6IkFkbWluIiwiZW1haWwiOiJOZWVkbGVzdGlja0BnbWFpbC5jb20iLCJpZCI6IjVmNzhjYWYyYjc2MTY3MDk1ZTZlYmYxMSJ9.ZxHjCmriQa-FCSoLuFoVgyfHSHKXJuAYFVYkbIrWGTQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"categoryName\" : \"Ok fine\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/category",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"category"
+							]
+						},
+						"description": "CREATE NEW CATEGORY"
+					},
+					"response": []
+				},
+				{
+					"name": "Get category by name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/category/Hoodie",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"category",
+								"Hoodie"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ProductSize",
+			"item": [
+				{
+					"name": "Get all product-size",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/size",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"size"
+							]
+						},
+						"description": "GET ALL Categories"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order",
+			"item": [
+				{
+					"name": "Create An Order With User Token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuZ3V5ZW4gdmFuIGMiLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiVVNFUiJ9XSwicGhvbmVOdW1iZXIiOiIwOTA4ODk5MzMiLCJmdWxsTmFtZSI6Im5ndXllbiB2YW4gYyIsImVtYWlsIjoic3ByaW5nMkBnbWFpbC5jb20iLCJpZCI6IjYwMDAwOTJhN2YyN2UwMjc0OTljNjQzYyJ9.Z6d1wvBNnzImQx81atASF_46iJ7okldkTpb_KvulI2Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBZG1pbl9va2ZlZmFmZXdmdyIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJVU0VSIn1dLCJwaG9uZSI6IjMxMzEyMzIxMzIxMyIsImVtYWlsIjoiZGZhZXdmIiwiaWQiOnsidGltZXN0YW1wIjoxNjAxNTI2MzEzLCJjb3VudGVyIjo2ODIyMjg4LCJ0aW1lIjoxNjAxNTI2MzEzMDAwLCJkYXRlIjoxNjAxNTI2MzEzMDAwLCJ0aW1lU2Vjb25kIjoxNjAxNTI2MzEzLCJtYWNoaW5lSWRlbnRpZmllciI6MTQ3ODMxNDgsInByb2Nlc3NJZGVudGlmaWVyIjoxMDM5OH19._G05yTu9UMNW_4GgY7Z7rqzVvrz3iyAqIab8k-VtTGU",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"address\" : \"123/321 Wallstreet\",\r\n    \"note\" : \"to my doorstep\",\r\n    \"createOrderDetails\": [\r\n        {\r\n            \"productId\" : \"600019367b018a7802360768\",\r\n            \"sizeId\" : \"5ff5b8e58fcbcf16bae675be\",\r\n            \"colorId\" : \"5ff5b93e8fcbcf16bae675c1\",\r\n            \"quantity\" : 3\r\n        },\r\n        {\r\n            \"productId\" : \"600019367b018a7802360768\",\r\n            \"sizeId\" : \"5ff5b8e58fcbcf16bae675bf\",\r\n            \"colorId\" : \"5ff5b93e8fcbcf16bae675c2\",\r\n            \"quantity\" : 1\r\n        },\r\n        {\r\n            \"productId\" : \"600019367b018a7802360768\",\r\n            \"sizeId\" : \"5ff5b8e58fcbcf16bae675c0\",\r\n            \"colorId\" : \"5ff5b93e8fcbcf16bae675c3\",\r\n            \"quantity\" : 3\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/order",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"order"
+							]
+						},
+						"description": "GET ALL ORDERS"
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch a List of Orders With User Token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuZ3V5ZW4gdmFuIGMiLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiVVNFUiJ9XSwicGhvbmVOdW1iZXIiOiIwOTA4ODk5MzMiLCJmdWxsTmFtZSI6Im5ndXllbiB2YW4gYyIsImVtYWlsIjoic3ByaW5nMkBnbWFpbC5jb20iLCJpZCI6IjYwMDAwOTJhN2YyN2UwMjc0OTljNjQzYyJ9.Z6d1wvBNnzImQx81atASF_46iJ7okldkTpb_KvulI2Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/user/order?page=0&rows=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"order"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "rows",
+									"value": "1"
+								}
+							]
+						},
+						"description": "GET ALL ORDERS"
+					},
+					"response": []
+				},
+				{
+					"name": "Get order by orderId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJOb3Rub3QiLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiVVNFUiJ9XSwicGhvbmUiOiIwOTAwMDAwMzEyIiwibmFtZSI6Ik5vdG5vdCIsImVtYWlsIjoic3ByaW5nMkBnbWFpbC5jb20iLCJpZCI6IjVmZDFlZmIxNzIxZDE2MzczYWI5YmM4MCJ9.E0Lqr8Ff8Q5vh6p_0WRpTQcz6suRQnQ_LWTbcFe9wxY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/order/600020570a020567dde3924b",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"order",
+								"600020570a020567dde3924b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unregistered User creates new Order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"unregisteredUser\":{\r\n        \"fullName\" :\"nguyen van a\",\r\n        \"phoneNumber\" : \"090329302\",\r\n        \"address\" : \"142/141 ABC stt\",\r\n        \"email\" : \"okok@gmail.com\"\r\n    },\r\n    \r\n    \"createOrderRequestModel\":{\r\n        \"address\" : \"123/321 Wallstreet\",\r\n        \"note\" : \"to my doorstep\",\r\n        \"createOrderDetails\": [\r\n            {\r\n                \"productId\" : \"600019367b018a7802360768\",\r\n                \"sizeId\" : \"5ff5b8e58fcbcf16bae675bf\",\r\n                \"colorId\" : \"5ff5b93e8fcbcf16bae675c2\",\r\n                \"quantity\" : 1\r\n            },\r\n            {\r\n                \"productId\" : \"600019367b018a7802360768\",\r\n                \"sizeId\" : \"5ff5b8e58fcbcf16bae675c0\",\r\n                \"colorId\" : \"5ff5b93e8fcbcf16bae675c3\",\r\n                \"quantity\" : 3\r\n            }\r\n        ]\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/order/unregistered",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"order",
+								"unregistered"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Size",
+			"item": [
+				{
+					"name": "get a list of Sizes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJOb3Rub3QiLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiVVNFUiJ9XSwicGhvbmUiOiIwOTAwMDAwMzEyIiwibmFtZSI6Ik5vdG5vdCIsImVtYWlsIjoic3ByaW5nMkBnbWFpbC5jb20iLCJpZCI6IjVmZDFlZmIxNzIxZDE2MzczYWI5YmM4MCJ9.E0Lqr8Ff8Q5vh6p_0WRpTQcz6suRQnQ_LWTbcFe9wxY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/size",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"size"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADMIN creates new Size",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"sizeName\" : \"XL\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/size",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"size"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Color",
+			"item": [
+				{
+					"name": "get a list of Colors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/color",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"color"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADMIN creates new Color",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRE1JTiBuZ3V5ZW4gdmFuIGIiLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQURNSU4ifV0sInBob25lTnVtYmVyIjoiMDkwMzEyMDMyMzMiLCJmdWxsTmFtZSI6IkFETUlOIG5ndXllbiB2YW4gYiIsImVtYWlsIjoiYWRtaW5TcHJpbmcyQGdtYWlsLmNvbSIsImlkIjoiNWZmZmZjMDQyMzBlZjY3MTEwZmM5MjA4In0.66imJM4CeT3FOGGPeZf06YB1RFtZPAfYqz8H4p-dYrk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"colorName\" : \"purple\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/color",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"color"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Brand",
+			"item": [
+				{
+					"name": "get a list of Brands",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/brand",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"brand"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADMIN creates new Brand",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRE1JTiBuZ3V5ZW4gdmFuIGIiLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQURNSU4ifV0sInBob25lTnVtYmVyIjoiMDkwMzEyMDMyMzMiLCJmdWxsTmFtZSI6IkFETUlOIG5ndXllbiB2YW4gYiIsImVtYWlsIjoiYWRtaW5TcHJpbmcyQGdtYWlsLmNvbSIsImlkIjoiNWZmZmZjMDQyMzBlZjY3MTEwZmM5MjA4In0.66imJM4CeT3FOGGPeZf06YB1RFtZPAfYqz8H4p-dYrk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"brandName\" : \"Bitis Hunter\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/brand",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"brand"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inventory",
+			"item": [
+				{
+					"name": "Get Inventory's Quantity given productId + productSizeId + colorId",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/inventory?ProductId=5ff5e3ff580cfd50972cee28&ProductSizeId=5ff5b8e58fcbcf16bae675bf&ColorId=5ff5b93e8fcbcf16bae675c2",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"inventory"
+							],
+							"query": [
+								{
+									"key": "ProductId",
+									"value": "5ff5e3ff580cfd50972cee28"
+								},
+								{
+									"key": "ProductSizeId",
+									"value": "5ff5b8e58fcbcf16bae675bf"
+								},
+								{
+									"key": "ColorId",
+									"value": "5ff5b93e8fcbcf16bae675c2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "hostname",
+			"value": "ec2-54-251-162-72.ap-southeast-1.compute.amazonaws.com:8080"
+		}
+	]
+}
