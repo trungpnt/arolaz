@@ -16,7 +16,7 @@ and import the Ecommerce APIs.postman_collection.json file into Postman for APIs
 6. Adding product to order list without logging into application
 7. Admin role can add/update/delete products and users
 
-## Build and Deploy
+## Build
 ### Running apps independently with maven installed:
 Run as spring-boot application 
 
