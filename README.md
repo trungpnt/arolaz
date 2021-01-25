@@ -1,6 +1,7 @@
 # arolaz
+You may first download this repo
 
-**Spring-Boot and Angular e-commerce app with Microservices architecture using Spring Cloud**
+**Spring-Boot and Angular e-commerce app**
 
 ### Technologies
 - Java 8
