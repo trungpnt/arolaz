@@ -1,6 +1,6 @@
 # arolaz
-You may first need to download this repo
-and import the Ecommerce APIs.postman_collection.json file into Postman for APIs.
+
+Please import the Ecommerce APIs.postman_collection.json file into Postman.
 
 **Spring-Boot and Angular e-commerce app**
 
